@@ -3,8 +3,9 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
@@ -25,131 +26,103 @@ app.use(session({
     cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 heures
 }));
 
-// Base de données SQLite
-const db = new sqlite3.Database('./streaming.db', (err) => {
-    if (err) {
-        console.error('Erreur de connexion à la base de données:', err);
-    } else {
-        console.log('Connecté à la base de données SQLite');
-        initDatabase().catch(console.error);
-    }
+// Base de données PostgreSQL
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
+pool.on('connect', () => {
+    console.log('Connecté à la base de données PostgreSQL');
+    initDatabase().catch(console.error);
+});
+
+pool.on('error', (err) => {
+    console.error('Erreur de connexion à la base de données:', err);
 });
 
 // Initialisation de la base de données
 async function initDatabase() {
-    // Créer la table users
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        name TEXT NOT NULL,
-        subscription_type TEXT DEFAULT 'free',
-        subscription_end DATE,
-        role TEXT DEFAULT 'user',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, async (err) => {
-        if (err) {
-            console.error('Erreur création table users:', err);
+    try {
+        // Créer la table users
+        await pool.query(`CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            name TEXT NOT NULL,
+            subscription_type TEXT DEFAULT 'free',
+            subscription_end DATE,
+            role TEXT DEFAULT 'user',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )`);
+        console.log('✓ Table users créée/vérifiée');
+
+        // Créer la table movies
+        await pool.query(`CREATE TABLE IF NOT EXISTS movies (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            year INTEGER,
+            duration TEXT,
+            genre TEXT,
+            rating REAL,
+            poster TEXT,
+            trailer TEXT,
+            video_url TEXT,
+            premium BOOLEAN DEFAULT false,
+            embed_code TEXT
+        )`);
+        console.log('✓ Table movies créée/vérifiée');
+
+        // Créer la table watchlist
+        await pool.query(`CREATE TABLE IF NOT EXISTS watchlist (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            movie_id INTEGER NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+            added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, movie_id)
+        )`);
+        console.log('✓ Table watchlist créée/vérifiée');
+
+        // Vérifier si des films existent déjà
+        const result = await pool.query('SELECT COUNT(*) as count FROM movies');
+        const count = parseInt(result.rows[0].count);
+
+        if (count === 0) {
+            console.log('Ajout des films d\'exemple...');
+
+            // Créer un utilisateur admin par défaut
+            const hashedAdminPassword = await bcrypt.hash('admin123', 10);
+            await pool.query(
+                'INSERT INTO users (email, password, name, role) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO NOTHING',
+                ['admin@cinestream.com', hashedAdminPassword, 'Administrateur', 'admin']
+            );
+            console.log('✓ Administrateur créé (admin@cinestream.com / admin123)');
+
+            // Ajouter des films d'exemple (tous premium pour tester les restrictions)
+            const movies = [
+                ['Inception', 'Un voleur spécialisé dans l\'extraction de secrets enfouis dans le subconscient', 2010, '2h 28min', 'Sci-Fi, Thriller', 8.8, 'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg', 'https://www.youtube.com/watch?v=YoHD9XEInc0', 'sample_video.mp4', true],
+                ['The Dark Knight', 'Batman doit accepter l\'une des plus grandes épreuves psychologiques et physiques', 2008, '2h 32min', 'Action, Crime, Drama', 9.0, 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', 'https://www.youtube.com/watch?v=EXeTwQWrcwY', 'sample_video.mp4', true],
+                ['Interstellar', 'Une équipe d\'explorateurs voyage à travers un trou de ver dans l\'espace', 2014, '2h 49min', 'Sci-Fi, Drama', 8.6, 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', 'https://www.youtube.com/watch?v=zSWdZVtXT7E', 'sample_video.mp4', true],
+                ['Pulp Fiction', 'Les vies de deux tueurs de la mafia, d\'un boxeur et d\'un gangster s\'entremêlent', 1994, '2h 34min', 'Crime, Drama', 8.9, 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg', 'https://www.youtube.com/watch?v=s7EdQ4FqbhY', 'sample_video.mp4', true],
+                ['The Matrix', 'Un hacker découvre que la réalité qu\'il connaît n\'est qu\'une simulation', 1999, '2h 16min', 'Sci-Fi, Action', 8.7, 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', 'https://www.youtube.com/watch?v=vKQi3bBA1y8', 'sample_video.mp4', true],
+                ['Fight Club', 'Un employé de bureau insomniac et un vendeur de savon forment un club de combat souterrain', 1999, '2h 19min', 'Drama', 8.8, 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', 'https://www.youtube.com/watch?v=SUXWAEX2jlg', 'sample_video.mp4', true]
+            ];
+
+            for (const movie of movies) {
+                await pool.query(
+                    'INSERT INTO movies (title, description, year, duration, genre, rating, poster, trailer, video_url, premium) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+                    movie
+                );
+            }
+
+            console.log('✓ 6 films ajoutés à la base de données');
         } else {
-            console.log('✓ Table users créée/vérifiée');
+            console.log(`✓ ${count} film(s) déjà présent(s) dans la base`);
         }
-    });
-
-    // Créer la table movies
-    db.run(`CREATE TABLE IF NOT EXISTS movies (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT,
-        year INTEGER,
-        duration TEXT,
-        genre TEXT,
-        rating REAL,
-        poster TEXT,
-        trailer TEXT,
-        video_url TEXT,
-        premium BOOLEAN DEFAULT 0,
-        embed_code TEXT
-    )`, (err) => {
-        if (err) {
-            console.error('Erreur création table movies:', err);
-        } else {
-            console.log('✓ Table movies créée/vérifiée');
-        }
-    });
-
-    // Créer la table watchlist
-    db.run(`CREATE TABLE IF NOT EXISTS watchlist (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        movie_id INTEGER NOT NULL,
-        added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-        FOREIGN KEY (movie_id) REFERENCES movies (id) ON DELETE CASCADE,
-        UNIQUE(user_id, movie_id)
-    )`, (err) => {
-        if (err) {
-            console.error('Erreur création table movies:', err);
-        } else {
-            console.log('✓ Table movies créée/vérifiée');
-            
-            // Vérifier si des films existent déjà
-            db.get(`SELECT COUNT(*) as count FROM movies`, [], (err, row) => {
-                if (err) {
-                    console.error('Erreur vérification films:', err);
-                    return;
-                }
-                
-                if (row.count === 0) {
-                    console.log('Ajout des films d\'exemple...');
-                    
-                    // Créer un utilisateur admin par défaut
-                    bcrypt.hash('admin123', 10, (err, hashedAdminPassword) => {
-                        if (err) {
-                            console.error('Erreur hash admin password:', err);
-                            return;
-                        }
-
-                        db.run(`INSERT OR IGNORE INTO users (email, password, name, role) VALUES (?, ?, ?, ?)`,
-                            ['admin@cinestream.com', hashedAdminPassword, 'Administrateur', 'admin'],
-                            (err) => {
-                                if (err) {
-                                    console.error('Erreur création admin:', err);
-                                } else {
-                                    console.log('✓ Administrateur créé (admin@cinestream.com / admin123)');
-                                }
-                            }
-                        );
-                    });
-
-                    // Ajouter des films d'exemple (tous premium pour tester les restrictions)
-                    const movies = [
-                        ['Inception', 'Un voleur spécialisé dans l\'extraction de secrets enfouis dans le subconscient', 2010, '2h 28min', 'Sci-Fi, Thriller', 8.8, 'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg', 'https://www.youtube.com/watch?v=YoHD9XEInc0', 'sample_video.mp4', 1],
-                        ['The Dark Knight', 'Batman doit accepter l\'une des plus grandes épreuves psychologiques et physiques', 2008, '2h 32min', 'Action, Crime, Drama', 9.0, 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', 'https://www.youtube.com/watch?v=EXeTwQWrcwY', 'sample_video.mp4', 1],
-                        ['Interstellar', 'Une équipe d\'explorateurs voyage à travers un trou de ver dans l\'espace', 2014, '2h 49min', 'Sci-Fi, Drama', 8.6, 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', 'https://www.youtube.com/watch?v=zSWdZVtXT7E', 'sample_video.mp4', 1],
-                        ['Pulp Fiction', 'Les vies de deux tueurs de la mafia, d\'un boxeur et d\'un gangster s\'entremêlent', 1994, '2h 34min', 'Crime, Drama', 8.9, 'https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg', 'https://www.youtube.com/watch?v=s7EdQ4FqbhY', 'sample_video.mp4', 1],
-                        ['The Matrix', 'Un hacker découvre que la réalité qu\'il connaît n\'est qu\'une simulation', 1999, '2h 16min', 'Sci-Fi, Action', 8.7, 'https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg', 'https://www.youtube.com/watch?v=vKQi3bBA1y8', 'sample_video.mp4', 1],
-                        ['Fight Club', 'Un employé de bureau insomniac et un vendeur de savon forment un club de combat souterrain', 1999, '2h 19min', 'Drama', 8.8, 'https://image.tmdb.org/t/p/w500/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg', 'https://www.youtube.com/watch?v=SUXWAEX2jlg', 'sample_video.mp4', 1]
-                    ];
-
-                    const stmt = db.prepare(`INSERT INTO movies (title, description, year, duration, genre, rating, poster, trailer, video_url, premium) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-                    
-                    movies.forEach((movie, index) => {
-                        stmt.run(movie, (err) => {
-                            if (err) {
-                                console.error(`Erreur ajout film ${movie[0]}:`, err);
-                            }
-                        });
-                    });
-                    
-                    stmt.finalize(() => {
-                        console.log('✓ 6 films ajoutés à la base de données');
-                    });
-                } else {
-                    console.log(`✓ ${row.count} film(s) déjà présent(s) dans la base`);
-                }
-            });
-        }
-    });
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation de la base de données:', error);
+    }
 }
 
 // Routes API
@@ -157,43 +130,48 @@ async function initDatabase() {
 // Inscription
 app.post('/api/register', async (req, res) => {
     const { email, password, name } = req.body;
-    
+
     if (!email || !password || !name) {
         return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    db.run(`INSERT INTO users (email, password, name) VALUES (?, ?, ?)`,
-        [email, hashedPassword, name],
-        function(err) {
-            if (err) {
-                if (err.message.includes('UNIQUE')) {
-                    return res.status(400).json({ error: 'Cet email est déjà utilisé' });
-                }
-                return res.status(500).json({ error: 'Erreur lors de l\'inscription' });
-            }
-            res.json({ message: 'Inscription réussie', userId: this.lastID });
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const result = await pool.query(
+            'INSERT INTO users (email, password, name) VALUES ($1, $2, $3) RETURNING id',
+            [email, hashedPassword, name]
+        );
+
+        res.json({ message: 'Inscription réussie', userId: result.rows[0].id });
+    } catch (err) {
+        if (err.code === '23505') { // Unique violation
+            return res.status(400).json({ error: 'Cet email est déjà utilisé' });
         }
-    );
+        console.error('Erreur lors de l\'inscription:', err);
+        return res.status(500).json({ error: 'Erreur lors de l\'inscription' });
+    }
 });
 
 // Connexion
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    
-    db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
-        if (err || !user) {
+
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        const user = result.rows[0];
+
+        if (!user) {
             return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
         }
-        
+
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
             return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
         }
-        
+
         req.session.userId = user.id;
-        res.json({ 
+        res.json({
             message: 'Connexion réussie',
             user: {
                 id: user.id,
@@ -202,7 +180,10 @@ app.post('/api/login', (req, res) => {
                 subscription_type: user.subscription_type
             }
         });
-    });
+    } catch (err) {
+        console.error('Erreur lors de la connexion:', err);
+        return res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // Déconnexion
@@ -212,36 +193,46 @@ app.post('/api/logout', (req, res) => {
 });
 
 // Vérifier la session
-app.get('/api/check-auth', (req, res) => {
+app.get('/api/check-auth', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ authenticated: false });
     }
 
-    db.get(`SELECT id, email, name, subscription_type, role FROM users WHERE id = ?`,
-        [req.session.userId],
-        (err, user) => {
-            if (err || !user) {
-                return res.status(401).json({ authenticated: false });
-            }
-            res.json({ authenticated: true, user });
+    try {
+        const result = await pool.query(
+            'SELECT id, email, name, subscription_type, role FROM users WHERE id = $1',
+            [req.session.userId]
+        );
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(401).json({ authenticated: false });
         }
-    );
+        res.json({ authenticated: true, user });
+    } catch (err) {
+        console.error('Erreur lors de la vérification de la session:', err);
+        return res.status(500).json({ authenticated: false });
+    }
 });
 
 // Récupérer tous les films
-app.get('/api/movies', (req, res) => {
-    db.all(`SELECT * FROM movies`, [], (err, movies) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur lors de la récupération des films' });
-        }
-        res.json(movies);
-    });
+app.get('/api/movies', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM movies ORDER BY id');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des films:', err);
+        return res.status(500).json({ error: 'Erreur lors de la récupération des films' });
+    }
 });
 
 // Récupérer un film par ID
-app.get('/api/movies/:id', (req, res) => {
-    db.get(`SELECT * FROM movies WHERE id = ?`, [req.params.id], (err, movie) => {
-        if (err || !movie) {
+app.get('/api/movies/:id', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM movies WHERE id = $1', [req.params.id]);
+        const movie = result.rows[0];
+
+        if (!movie) {
             return res.status(404).json({ error: 'Film non trouvé' });
         }
 
@@ -255,23 +246,28 @@ app.get('/api/movies/:id', (req, res) => {
             }
 
             // Vérifier l'abonnement
-            db.get(`SELECT subscription_type FROM users WHERE id = ?`, [req.session.userId], (err, user) => {
-                if (err || !user || user.subscription_type === 'free') {
-                    return res.status(403).json({
-                        error: 'Abonnement premium requis',
-                        requiresSubscription: true
-                    });
-                }
-                res.json(movie);
-            });
-        } else {
-            res.json(movie);
+            const userResult = await pool.query(
+                'SELECT subscription_type FROM users WHERE id = $1',
+                [req.session.userId]
+            );
+            const user = userResult.rows[0];
+
+            if (!user || user.subscription_type === 'free') {
+                return res.status(403).json({
+                    error: 'Abonnement premium requis',
+                    requiresSubscription: true
+                });
+            }
         }
-    });
+        res.json(movie);
+    } catch (err) {
+        console.error('Erreur lors de la récupération du film:', err);
+        return res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // Mettre à jour l'abonnement
-app.post('/api/subscribe', (req, res) => {
+app.post('/api/subscribe', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Non authentifié' });
     }
@@ -280,24 +276,24 @@ app.post('/api/subscribe', (req, res) => {
     const subscriptionEnd = new Date();
     subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 1);
 
-    db.run(`UPDATE users SET subscription_type = ?, subscription_end = ? WHERE id = ?`,
-        [plan, subscriptionEnd.toISOString(), req.session.userId],
-        (err) => {
-            if (err) {
-                return res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'abonnement' });
-            }
-            // Rediriger vers la page des films après l'abonnement réussi
-            res.json({
-                message: 'Abonnement mis à jour avec succès',
-                plan,
-                redirect: '/movies.html'
-            });
-        }
-    );
+    try {
+        await pool.query(
+            'UPDATE users SET subscription_type = $1, subscription_end = $2 WHERE id = $3',
+            [plan, subscriptionEnd.toISOString(), req.session.userId]
+        );
+        res.json({
+            message: 'Abonnement mis à jour avec succès',
+            plan,
+            redirect: '/movies.html'
+        });
+    } catch (err) {
+        console.error('Erreur lors de la mise à jour de l\'abonnement:', err);
+        return res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'abonnement' });
+    }
 });
 
 // Mettre à jour le profil
-app.post('/api/update-profile', (req, res) => {
+app.post('/api/update-profile', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Non authentifié' });
     }
@@ -308,65 +304,74 @@ app.post('/api/update-profile', (req, res) => {
         return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
-    // Vérifier si l'email est déjà utilisé par un autre utilisateur
-    db.get(`SELECT id FROM users WHERE email = ? AND id != ?`, [email, req.session.userId], (err, existingUser) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur lors de la vérification de l\'email' });
-        }
+    try {
+        // Vérifier si l'email est déjà utilisé par un autre utilisateur
+        const existingUser = await pool.query(
+            'SELECT id FROM users WHERE email = $1 AND id != $2',
+            [email, req.session.userId]
+        );
 
-        if (existingUser) {
+        if (existingUser.rows.length > 0) {
             return res.status(400).json({ error: 'Cet email est déjà utilisé' });
         }
 
         // Mettre à jour le profil
-        db.run(`UPDATE users SET name = ?, email = ? WHERE id = ?`,
-            [name, email, req.session.userId],
-            function(err) {
-                if (err) {
-                    return res.status(500).json({ error: 'Erreur lors de la mise à jour du profil' });
-                }
-
-                // Récupérer les données mises à jour
-                db.get(`SELECT id, email, name, subscription_type, role FROM users WHERE id = ?`,
-                    [req.session.userId],
-                    (err, user) => {
-                        if (err) {
-                            return res.status(500).json({ error: 'Erreur lors de la récupération des données' });
-                        }
-                        res.json({ message: 'Profil mis à jour avec succès', user });
-                    }
-                );
-            }
+        await pool.query(
+            'UPDATE users SET name = $1, email = $2 WHERE id = $3',
+            [name, email, req.session.userId]
         );
-    });
+
+        // Récupérer les données mises à jour
+        const result = await pool.query(
+            'SELECT id, email, name, subscription_type, role FROM users WHERE id = $1',
+            [req.session.userId]
+        );
+
+        res.json({ message: 'Profil mis à jour avec succès', user: result.rows[0] });
+    } catch (err) {
+        console.error('Erreur lors de la mise à jour du profil:', err);
+        return res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // API Admin - Vérifier si l'utilisateur est admin
-function requireAdmin(req, res, next) {
+async function requireAdmin(req, res, next) {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Non authentifié' });
     }
 
-    db.get(`SELECT role FROM users WHERE id = ?`, [req.session.userId], (err, user) => {
-        if (err || !user || user.role !== 'admin') {
+    try {
+        const result = await pool.query(
+            'SELECT role FROM users WHERE id = $1',
+            [req.session.userId]
+        );
+        const user = result.rows[0];
+
+        if (!user || user.role !== 'admin') {
             return res.status(403).json({ error: 'Accès refusé - Droits administrateur requis' });
         }
         next();
-    });
+    } catch (err) {
+        console.error('Erreur lors de la vérification admin:', err);
+        return res.status(500).json({ error: 'Erreur serveur' });
+    }
 }
 
 // API Admin - Récupérer tous les utilisateurs
-app.get('/api/admin/users', requireAdmin, (req, res) => {
-    db.all(`SELECT id, email, name, subscription_type, role, created_at FROM users ORDER BY created_at DESC`, [], (err, users) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
-        }
-        res.json(users);
-    });
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT id, email, name, subscription_type, role, created_at FROM users ORDER BY created_at DESC'
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des utilisateurs:', err);
+        return res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
+    }
 });
 
 // API Admin - Modifier le rôle d'un utilisateur
-app.post('/api/admin/users/:id/role', requireAdmin, (req, res) => {
+app.post('/api/admin/users/:id/role', requireAdmin, async (req, res) => {
     const { role } = req.body;
     const userId = req.params.id;
 
@@ -374,16 +379,17 @@ app.post('/api/admin/users/:id/role', requireAdmin, (req, res) => {
         return res.status(400).json({ error: 'Rôle invalide' });
     }
 
-    db.run(`UPDATE users SET role = ? WHERE id = ?`, [role, userId], (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur lors de la mise à jour du rôle' });
-        }
+    try {
+        await pool.query('UPDATE users SET role = $1 WHERE id = $2', [role, userId]);
         res.json({ message: 'Rôle mis à jour avec succès' });
-    });
+    } catch (err) {
+        console.error('Erreur lors de la mise à jour du rôle:', err);
+        return res.status(500).json({ error: 'Erreur lors de la mise à jour du rôle' });
+    }
 });
 
 // API Admin - Supprimer un utilisateur
-app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
     const userId = req.params.id;
 
     // Empêcher la suppression de son propre compte
@@ -391,36 +397,39 @@ app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
         return res.status(400).json({ error: 'Vous ne pouvez pas supprimer votre propre compte' });
     }
 
-    db.run(`DELETE FROM users WHERE id = ?`, [userId], (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur' });
-        }
+    try {
+        await pool.query('DELETE FROM users WHERE id = $1', [userId]);
         res.json({ message: 'Utilisateur supprimé avec succès' });
-    });
+    } catch (err) {
+        console.error('Erreur lors de la suppression de l\'utilisateur:', err);
+        return res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur' });
+    }
 });
 
 // API Admin - Ajouter un film
-app.post('/api/admin/movies', requireAdmin, (req, res) => {
+app.post('/api/admin/movies', requireAdmin, async (req, res) => {
     const { title, description, year, duration, genre, rating, poster, trailer, video_url, embed_code, premium } = req.body;
 
     if (!title || !description || !year || !genre) {
         return res.status(400).json({ error: 'Titre, description, année et genre sont requis' });
     }
 
-    db.run(`INSERT INTO movies (title, description, year, duration, genre, rating, poster, trailer, video_url, embed_code, premium)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [title, description, year, duration || '', genre, rating || 0, poster || '', trailer || '', video_url || '', embed_code || '', premium ? 1 : 0],
-        function(err) {
-            if (err) {
-                return res.status(500).json({ error: 'Erreur lors de l\'ajout du film' });
-            }
-            res.json({ message: 'Film ajouté avec succès', movieId: this.lastID });
-        }
-    );
+    try {
+        const result = await pool.query(
+            `INSERT INTO movies (title, description, year, duration, genre, rating, poster, trailer, video_url, embed_code, premium)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+             RETURNING id`,
+            [title, description, year, duration || '', genre, rating || 0, poster || '', trailer || '', video_url || '', embed_code || '', premium]
+        );
+        res.json({ message: 'Film ajouté avec succès', movieId: result.rows[0].id });
+    } catch (err) {
+        console.error('Erreur lors de l\'ajout du film:', err);
+        return res.status(500).json({ error: 'Erreur lors de l\'ajout du film' });
+    }
 });
 
 // API Admin - Modifier un film
-app.put('/api/admin/movies/:id', requireAdmin, (req, res) => {
+app.put('/api/admin/movies/:id', requireAdmin, async (req, res) => {
     const movieId = req.params.id;
     const { title, description, year, duration, genre, rating, poster, trailer, video_url, embed_code, premium } = req.body;
 
@@ -428,86 +437,93 @@ app.put('/api/admin/movies/:id', requireAdmin, (req, res) => {
         return res.status(400).json({ error: 'Titre, description, année et genre sont requis' });
     }
 
-    db.run(`UPDATE movies SET title = ?, description = ?, year = ?, duration = ?, genre = ?,
-            rating = ?, poster = ?, trailer = ?, video_url = ?, embed_code = ?, premium = ? WHERE id = ?`,
-        [title, description, year, duration || '', genre, rating || 0, poster || '', trailer || '', video_url || '', embed_code || '', premium ? 1 : 0, movieId],
-        (err) => {
-            if (err) {
-                return res.status(500).json({ error: 'Erreur lors de la modification du film' });
-            }
-            res.json({ message: 'Film modifié avec succès' });
-        }
-    );
+    try {
+        await pool.query(
+            `UPDATE movies SET title = $1, description = $2, year = $3, duration = $4, genre = $5,
+             rating = $6, poster = $7, trailer = $8, video_url = $9, embed_code = $10, premium = $11 WHERE id = $12`,
+            [title, description, year, duration || '', genre, rating || 0, poster || '', trailer || '', video_url || '', embed_code || '', premium, movieId]
+        );
+        res.json({ message: 'Film modifié avec succès' });
+    } catch (err) {
+        console.error('Erreur lors de la modification du film:', err);
+        return res.status(500).json({ error: 'Erreur lors de la modification du film' });
+    }
 });
 
 // API Admin - Supprimer un film
-app.delete('/api/admin/movies/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/movies/:id', requireAdmin, async (req, res) => {
     const movieId = req.params.id;
 
-    db.run(`DELETE FROM movies WHERE id = ?`, [movieId], (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur lors de la suppression du film' });
-        }
+    try {
+        await pool.query('DELETE FROM movies WHERE id = $1', [movieId]);
         res.json({ message: 'Film supprimé avec succès' });
-    });
+    } catch (err) {
+        console.error('Erreur lors de la suppression du film:', err);
+        return res.status(500).json({ error: 'Erreur lors de la suppression du film' });
+    }
 });
 
 // API Admin - Modifier un utilisateur
-app.put('/api/admin/users', requireAdmin, (req, res) => {
+app.put('/api/admin/users', requireAdmin, async (req, res) => {
     const { userId, name, email } = req.body;
 
     if (!userId || !name || !email) {
         return res.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
-    // Vérifier si l'email est déjà utilisé par un autre utilisateur
-    db.get(`SELECT id FROM users WHERE email = ? AND id != ?`, [email, userId], (err, existingUser) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur lors de la vérification de l\'email' });
-        }
+    try {
+        // Vérifier si l'email est déjà utilisé par un autre utilisateur
+        const existingUser = await pool.query(
+            'SELECT id FROM users WHERE email = $1 AND id != $2',
+            [email, userId]
+        );
 
-        if (existingUser) {
+        if (existingUser.rows.length > 0) {
             return res.status(400).json({ error: 'Cet email est déjà utilisé' });
         }
 
         // Mettre à jour l'utilisateur
-        db.run(`UPDATE users SET name = ?, email = ? WHERE id = ?`,
-            [name, email, userId],
-            (err) => {
-                if (err) {
-                    return res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur' });
-                }
-                res.json({ message: 'Utilisateur mis à jour avec succès' });
-            }
-        );
-    });
+        await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3',
+            [name, email, userId]);
+        res.json({ message: 'Utilisateur mis à jour avec succès' });
+    } catch (err) {
+        console.error('Erreur lors de la mise à jour de l\'utilisateur:', err);
+        return res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // API Admin - Récupérer un utilisateur spécifique
-app.get('/api/admin/users/:id', requireAdmin, (req, res) => {
+app.get('/api/admin/users/:id', requireAdmin, async (req, res) => {
     const userId = req.params.id;
 
-    db.get(`SELECT id, email, name, subscription_type, role, created_at FROM users WHERE id = ?`,
-        [userId], (err, user) => {
-        if (err || !user) {
+    try {
+        const result = await pool.query(
+            'SELECT id, email, name, subscription_type, role, created_at FROM users WHERE id = $1',
+            [userId]
+        );
+        const user = result.rows[0];
+
+        if (!user) {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
         res.json(user);
-    });
+    } catch (err) {
+        console.error('Erreur lors de la récupération de l\'utilisateur:', err);
+        return res.status(500).json({ error: 'Erreur serveur' });
+    }
 });
 
 // API Admin - Statistiques des abonnements
-app.get('/api/admin/subscription-stats', requireAdmin, (req, res) => {
+app.get('/api/admin/subscription-stats', requireAdmin, async (req, res) => {
     const stats = {};
 
-    // Compter par type d'abonnement
-    db.all(`SELECT subscription_type, COUNT(*) as count FROM users GROUP BY subscription_type`, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erreur stats abonnements' });
-        }
+    try {
+        // Compter par type d'abonnement
+        const result = await pool.query('SELECT subscription_type, COUNT(*) as count FROM users GROUP BY subscription_type');
+        const rows = result.rows;
 
         rows.forEach(row => {
-            stats[row.subscription_type] = row.count;
+            stats[row.subscription_type] = parseInt(row.count);
         });
 
         // Assurer que tous les types sont présents
@@ -517,38 +533,38 @@ app.get('/api/admin/subscription-stats', requireAdmin, (req, res) => {
         stats.premium = stats.premium || 0;
 
         res.json(stats);
-    });
+    } catch (err) {
+        console.error('Erreur stats abonnements:', err);
+        return res.status(500).json({ error: 'Erreur stats abonnements' });
+    }
 });
 
 // API Admin - Récupérer les statistiques
-app.get('/api/admin/stats', requireAdmin, (req, res) => {
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
     const stats = {};
 
-    // Compter les utilisateurs
-    db.get(`SELECT COUNT(*) as total FROM users`, [], (err, row) => {
-        if (err) return res.status(500).json({ error: 'Erreur stats utilisateurs' });
-        stats.totalUsers = row.total;
+    try {
+        // Compter les utilisateurs
+        const usersResult = await pool.query('SELECT COUNT(*) as total FROM users');
+        stats.totalUsers = parseInt(usersResult.rows[0].total);
 
         // Compter les abonnements
-        db.get(`SELECT COUNT(*) as total FROM users WHERE subscription_type != 'free'`, [], (err, row) => {
-            if (err) return res.status(500).json({ error: 'Erreur stats abonnements' });
-            stats.totalSubscribers = row.total;
+        const subsResult = await pool.query("SELECT COUNT(*) as total FROM users WHERE subscription_type != 'free'");
+        stats.totalSubscribers = parseInt(subsResult.rows[0].total);
 
-            // Compter les films
-            db.get(`SELECT COUNT(*) as total FROM movies`, [], (err, row) => {
-                if (err) return res.status(500).json({ error: 'Erreur stats films' });
-                stats.totalMovies = row.total;
+        // Compter les films
+        const moviesResult = await pool.query('SELECT COUNT(*) as total FROM movies');
+        stats.totalMovies = parseInt(moviesResult.rows[0].total);
 
-                // Compter les films premium
-                db.get(`SELECT COUNT(*) as total FROM movies WHERE premium = 1`, [], (err, row) => {
-                    if (err) return res.status(500).json({ error: 'Erreur stats films premium' });
-                    stats.totalPremiumMovies = row.total;
+        // Compter les films premium
+        const premiumResult = await pool.query('SELECT COUNT(*) as total FROM movies WHERE premium = true');
+        stats.totalPremiumMovies = parseInt(premiumResult.rows[0].total);
 
-                    res.json(stats);
-                });
-            });
-        });
-    });
+        res.json(stats);
+    } catch (err) {
+        console.error('Erreur stats:', err);
+        return res.status(500).json({ error: 'Erreur lors du calcul des statistiques' });
+    }
 });
 
 // Changer le mot de passe
@@ -569,33 +585,33 @@ app.post('/api/change-password', async (req, res) => {
 
     try {
         // Vérifier le mot de passe actuel
-        db.get(`SELECT password FROM users WHERE id = ?`, [req.session.userId], async (err, user) => {
-            if (err || !user) {
-                return res.status(500).json({ error: 'Utilisateur non trouvé' });
-            }
+        const userResult = await pool.query(
+            'SELECT password FROM users WHERE id = $1',
+            [req.session.userId]
+        );
+        const user = userResult.rows[0];
 
-            const validPassword = await bcrypt.compare(currentPassword, user.password);
-            if (!validPassword) {
-                return res.status(400).json({ error: 'Mot de passe actuel incorrect' });
-            }
+        if (!user) {
+            return res.status(500).json({ error: 'Utilisateur non trouvé' });
+        }
 
-            // Hasher le nouveau mot de passe
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const validPassword = await bcrypt.compare(currentPassword, user.password);
+        if (!validPassword) {
+            return res.status(400).json({ error: 'Mot de passe actuel incorrect' });
+        }
 
-            // Mettre à jour le mot de passe
-            db.run(`UPDATE users SET password = ? WHERE id = ?`,
-                [hashedPassword, req.session.userId],
-                (err) => {
-                    if (err) {
-                        return res.status(500).json({ error: 'Erreur lors du changement de mot de passe' });
-                    }
-                    res.json({ message: 'Mot de passe changé avec succès' });
-                }
-            );
-        });
+        // Hasher le nouveau mot de passe
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Mettre à jour le mot de passe
+        await pool.query(
+            'UPDATE users SET password = $1 WHERE id = $2',
+            [hashedPassword, req.session.userId]
+        );
+        res.json({ message: 'Mot de passe changé avec succès' });
     } catch (error) {
         console.error('Erreur lors du changement de mot de passe:', error);
-        res.status(500).json({ error: 'Erreur serveur' });
+        return res.status(500).json({ error: 'Erreur serveur' });
     }
 });
 
