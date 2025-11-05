@@ -13,6 +13,12 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Route pour éviter l'erreur 502 du favicon
+app.get('/favicon.ico', (req, res) => {
+    res.status(204).end(); // Retourne une réponse vide sans contenu
+});
+
 app.use(express.static('public'));
 
 // Suppression de la route favicon spécifique - Express static gérera automatiquement
@@ -21,10 +27,13 @@ app.use(express.static('public'));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 app.use(session({
-    secret: 'streaming-secret-key-2024',
+    secret: process.env.SESSION_SECRET || 'streaming-secret-key-2024',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 heures
+    cookie: {
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        secure: process.env.NODE_ENV === 'production' // HTTPS en production
+    }
 }));
 
 // Base de données PostgreSQL
