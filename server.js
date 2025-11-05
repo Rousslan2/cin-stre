@@ -36,7 +36,7 @@ app.use(session({
     }
 }));
 
-// Base de données PostgreSQL
+// Base de données PostgreSQL avec gestion d'erreur améliorée
 const getDatabaseUrl = () => {
     // Railway will provide DATABASE_URL automatically
     if (process.env.DATABASE_URL) {
@@ -49,48 +49,75 @@ const getDatabaseUrl = () => {
         return process.env.LOCAL_DATABASE_URL || 'postgresql://postgres:password@localhost:5432/streaming_db';
     }
     
-    throw new Error('DATABASE_URL environment variable is required in production');
+    return null; // Pour les cas où on veut continuer sans base de données
 };
 
 // Déclarer pool au niveau global pour l'utiliser dans tout le fichier
-let pool;
+let pool = null;
+let databaseAvailable = false;
 
-try {
-    pool = new Pool({
-        connectionString: getDatabaseUrl(),
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-    });
-
-    pool.on('connect', () => {
-        console.log('✓ Connecté à la base de données PostgreSQL');
-        initDatabase().catch(console.error);
-    });
-
-    pool.on('error', (err) => {
-        console.error('❌ Erreur de connexion à la base de données:', err.message);
-    });
-
-    // Test the connection immediately
-    pool.query('SELECT NOW()', (err, res) => {
-        if (err) {
-            console.error('❌ Échec du test de connexion à la base de données:', err.message);
-            if (process.env.NODE_ENV === 'production') {
-                console.error('💡 Vérifiez que DATABASE_URL est configuré dans Railway');
-                console.error('💡 Go to Railway Dashboard > Variables tab and add DATABASE_URL');
-                process.exit(1);
-            }
-        } else {
-            console.log('✓ Test de connexion réussi à', res.rows[0].now);
-        }
-    });
-
-} catch (dbError) {
-    console.error('❌ Erreur de configuration de la base de données:', dbError.message);
-    if (process.env.NODE_ENV === 'production') {
-        console.error('💡 Assurez-vous que DATABASE_URL est configuré dans les variables d\'environnement Railway');
-        console.error('💡 Go to Railway Dashboard > Variables tab and add DATABASE_URL');
-        process.exit(1);
+// Middleware pour vérifier la disponibilité de la base de données
+function checkDatabase(req, res, next) {
+    if (!databaseAvailable || !pool) {
+        return res.status(503).json({
+            error: 'Service temporairement indisponible - Base de données non configurée',
+            message: 'Veuillez configurer DATABASE_URL dans Railway Dashboard > Variables',
+            databaseStatus: 'disconnected'
+        });
     }
+    next();
+}
+
+// Configuration de la base de données avec gestion d'erreur progressive
+const databaseUrl = getDatabaseUrl();
+
+if (databaseUrl) {
+    try {
+        pool = new Pool({
+            connectionString: databaseUrl,
+            ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+        });
+
+        pool.on('connect', () => {
+            console.log('✓ Connecté à la base de données PostgreSQL');
+            initDatabase().catch(console.error);
+        });
+
+        pool.on('error', (err) => {
+            console.error('❌ Erreur de connexion à la base de données:', err.message);
+            databaseAvailable = false;
+        });
+
+        // Test the connection immediately
+        pool.query('SELECT NOW()', (err, res) => {
+            if (err) {
+                console.error('❌ Échec du test de connexion à la base de données:', err.message);
+                if (process.env.NODE_ENV === 'production') {
+                    console.error('💡 Vérifiez que DATABASE_URL est configuré dans Railway');
+                    console.error('💡 Go to Railway Dashboard > Variables tab and add DATABASE_URL');
+                    console.error('📌 Le serveur continuera sans base de données pour l\'instant');
+                }
+            } else {
+                console.log('✓ Test de connexion réussi à', res.rows[0].now);
+                databaseAvailable = true;
+            }
+        });
+
+    } catch (dbError) {
+        console.error('❌ Erreur de configuration de la base de données:', dbError.message);
+        databaseAvailable = false;
+        
+        if (process.env.NODE_ENV === 'production') {
+            console.error('💡 Assurez-vous que DATABASE_URL est configuré dans les variables d\'environnement Railway');
+            console.error('💡 Go to Railway Dashboard > Variables tab and add DATABASE_URL');
+            console.error('📌 Le serveur continuera sans base de données pour l\'instant');
+        }
+    }
+} else {
+    console.log('⚠️  DATABASE_URL non trouvée - serveur en mode limité (sans base de données)');
+    console.error('💡 Ajoutez DATABASE_URL dans Railway Dashboard > Variables');
+    console.error('📌 Certaines fonctionnalités seront limitées');
+    databaseAvailable = false;
 }
 
 // Initialisation de la base de données
@@ -180,7 +207,7 @@ async function initDatabase() {
 // Routes API
 
 // Inscription
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', checkDatabase, async (req, res) => {
     const { email, password, name } = req.body;
 
     if (!email || !password || !name) {
@@ -206,7 +233,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Connexion
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', checkDatabase, async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -245,7 +272,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 // Vérifier la session
-app.get('/api/check-auth', async (req, res) => {
+app.get('/api/check-auth', checkDatabase, async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ authenticated: false });
     }
@@ -268,7 +295,7 @@ app.get('/api/check-auth', async (req, res) => {
 });
 
 // Récupérer tous les films
-app.get('/api/movies', async (req, res) => {
+app.get('/api/movies', checkDatabase, async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM movies ORDER BY id');
         res.json(result.rows);
@@ -279,7 +306,7 @@ app.get('/api/movies', async (req, res) => {
 });
 
 // Récupérer un film par ID
-app.get('/api/movies/:id', async (req, res) => {
+app.get('/api/movies/:id', checkDatabase, async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM movies WHERE id = $1', [req.params.id]);
         const movie = result.rows[0];
@@ -319,7 +346,7 @@ app.get('/api/movies/:id', async (req, res) => {
 });
 
 // Mettre à jour l'abonnement
-app.post('/api/subscribe', async (req, res) => {
+app.post('/api/subscribe', checkDatabase, async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Non authentifié' });
     }
@@ -345,7 +372,7 @@ app.post('/api/subscribe', async (req, res) => {
 });
 
 // Mettre à jour le profil
-app.post('/api/update-profile', async (req, res) => {
+app.post('/api/update-profile', checkDatabase, async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Non authentifié' });
     }
