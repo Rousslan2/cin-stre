@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogue - CinéStream</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/movies.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <span>CinéStream</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="movies.html" class="active">Films</a></li>
+                <li><a href="subscription.html">Abonnements</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline">Connexion</a>
+                <a href="register.html" class="btn btn-primary">S'inscrire</a>
+            </div>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="account.html"><i class="fas fa-user"></i> Mon compte</a>
+                    <a href="admin.html" id="adminMenuBtn" class="admin-only" style="display: none;">
+                        <i class="fas fa-cog"></i> Administration
+                    </a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section de recherche et filtres -->
+    <section class="search-section">
+        <div class="container">
+            <h1 class="page-title">Découvrez votre <span class="gradient-text">prochain film</span></h1>
+            
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Rechercher un film, un genre, un acteur...">
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-film"></i>
+                    Tous
+                </button>
+                <button class="filter-btn" data-filter="Sci-Fi">
+                    <i class="fas fa-rocket"></i>
+                    Sci-Fi
+                </button>
+                <button class="filter-btn" data-filter="Action">
+                    <i class="fas fa-fist-raised"></i>
+                    Action
+                </button>
+                <button class="filter-btn" data-filter="Drama">
+                    <i class="fas fa-masks-theater"></i>
+                    Drame
+                </button>
+                <button class="filter-btn" data-filter="Crime">
+                    <i class="fas fa-user-secret"></i>
+                    Crime
+                </button>
+                <button class="filter-btn" data-filter="premium">
+                    <i class="fas fa-crown"></i>
+                    Premium
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catalogue de films -->
+    <section class="movies-catalog">
+        <div class="container">
+            <div class="catalog-header">
+                <h2>Tous les films</h2>
+                <div class="view-options">
+                    <button class="view-btn active" data-view="grid">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="view-btn" data-view="list">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="moviesGrid" class="movies-grid">
+                <!-- Les films seront chargés ici dynamiquement -->
+            </div>
+            
+            <div id="loadingSpinner" class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Chargement des films...</p>
+            </div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+                <i class="fas fa-film"></i>
+                <h3>Aucun film trouvé</h3>
+                <p>Essayez de modifier vos critères de recherche</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-film"></i>
+                        <span>CinéStream</span>
+                    </div>
+                    <p>Votre destination pour le streaming de films et séries en haute qualité.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="movies.html">Films</a></li>
+                        <li><a href="subscription.html">Abonnements</a></li>
+                        <li><a href="#">À propos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Centre d'aide</a></li>
+                        <li><a href="#">Nous contacter</a></li>
+                        <li><a href="#">Conditions d'utilisation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Restez informé des nouveautés</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Votre email">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 CinéStream. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/movies.js"></script>
+</body>
+</html>

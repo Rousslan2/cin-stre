@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - CinéStream</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Admin -->
+    <nav class="admin-navbar">
+        <div class="container">
+            <div class="admin-logo">
+                <i class="fas fa-cog"></i>
+                <span>Administration</span>
+            </div>
+            <div class="admin-nav-links">
+                <a href="index.html" class="btn btn-outline">
+                    <i class="fas fa-home"></i>
+                    Retour au site
+                </a>
+                <button onclick="logout()" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Déconnexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-user-info">
+                <div class="admin-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 id="adminName"></h3>
+                <p>Administrateur</p>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Tableau de bord
+                </a>
+                <a href="#users" class="nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    Gestion utilisateurs
+                </a>
+                <a href="#movies" class="nav-item" data-section="movies">
+                    <i class="fas fa-film"></i>
+                    Gestion films
+                </a>
+                <a href="#subscriptions" class="nav-item" data-section="subscriptions">
+                    <i class="fas fa-crown"></i>
+                    Abonnements
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    Paramètres
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="admin-section active">
+                <div class="section-header">
+                    <h1><i class="fas fa-tachometer-alt"></i> Tableau de bord</h1>
+                    <p>Bienvenue dans le panneau d'administration</p>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">-</h3>
+                            <p>Utilisateurs totaux</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalSubscribers">-</h3>
+                            <p>Abonnés actifs</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalMovies">-</h3>
+                            <p>Films disponibles</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPremiumMovies">-</h3>
+                            <p>Films premium</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <h2>Activité récente</h2>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-user-plus"></i>
+                            <div class="activity-content">
+                                <p>Nouvel utilisateur inscrit</p>
+                                <span class="activity-time">Il y a 5 minutes</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-crown"></i>
+                            <div class="activity-content">
+                                <p>Nouvel abonnement premium</p>
+                                <span class="activity-time">Il y a 15 minutes</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-film"></i>
+                            <div class="activity-content">
+                                <p>Film ajouté au catalogue</p>
+                                <span class="activity-time">Il y a 1 heure</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Management Section -->
+            <div id="users-section" class="admin-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-users"></i> Gestion des utilisateurs</h1>
+                    <p>Gérer les comptes utilisateurs et leurs permissions</p>
+                </div>
+
+                <div class="users-table-container">
+                    <table class="admin-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Abonnement</th>
+                                <th>Rôle</th>
+                                <th>Date d'inscription</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Movies Management Section -->
+            <div id="movies-section" class="admin-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-film"></i> Gestion des films</h1>
+                    <p>Ajouter, modifier et supprimer des films</p>
+                </div>
+
+                <div class="section-actions">
+                    <button class="btn btn-primary" onclick="openAddMovieModal()">
+                        <i class="fas fa-plus"></i>
+                        Ajouter un film
+                    </button>
+                </div>
+
+                <div class="movies-grid-admin" id="moviesGridAdmin">
+                    <!-- Movies will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Subscriptions Section -->
+            <div id="subscriptions-section" class="admin-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-crown"></i> Gestion des abonnements</h1>
+                    <p>Superviser les abonnements et paiements</p>
+                </div>
+
+                <div class="subscription-stats">
+                    <div class="subscription-plans">
+                        <div class="plan-stat">
+                            <h3>Basique</h3>
+                            <p class="plan-count" id="basicCount">-</p>
+                            <span class="plan-price">7.99€/mois</span>
+                        </div>
+                        <div class="plan-stat">
+                            <h3>Standard</h3>
+                            <p class="plan-count" id="standardCount">-</p>
+                            <span class="plan-price">12.99€/mois</span>
+                        </div>
+                        <div class="plan-stat">
+                            <h3>Premium</h3>
+                            <p class="plan-count" id="premiumCount">-</p>
+                            <span class="plan-price">17.99€/mois</span>
+                        </div>
+                    </div>
+
+                    <div class="subscription-actions">
+                        <button class="btn btn-primary" onclick="exportUserData()">
+                            <i class="fas fa-download"></i>
+                            Exporter les données
+                        </button>
+                        <button class="btn btn-outline" onclick="sendNewsletter()">
+                            <i class="fas fa-envelope"></i>
+                            Newsletter
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="admin-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-cog"></i> Paramètres système</h1>
+                    <p>Configurer les paramètres généraux du site</p>
+                </div>
+
+                <div class="settings-form">
+                    <div class="setting-group">
+                        <h3>Paramètres généraux</h3>
+                        <div class="setting-item">
+                            <label for="siteName">Nom du site</label>
+                            <input type="text" id="siteName" value="CinéStream">
+                        </div>
+                        <div class="setting-item">
+                            <label for="siteDescription">Description</label>
+                            <textarea id="siteDescription">Votre destination pour le streaming de films et séries en haute qualité.</textarea>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3>Prix des abonnements</h3>
+                        <div class="setting-item">
+                            <label for="basicPrice">Prix Basique (€/mois)</label>
+                            <input type="number" id="basicPrice" value="7.99">
+                        </div>
+                        <div class="setting-item">
+                            <label for="standardPrice">Prix Standard (€/mois)</label>
+                            <input type="number" id="standardPrice" value="12.99">
+                        </div>
+                        <div class="setting-item">
+                            <label for="premiumPrice">Prix Premium (€/mois)</label>
+                            <input type="number" id="premiumPrice" value="17.99">
+                        </div>
+                    </div>
+
+                    <div class="setting-actions">
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            <i class="fas fa-save"></i>
+                            Enregistrer les paramètres
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Movie Modal -->
+    <div id="addMovieModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ajouter un film</h2>
+                <button class="close-modal" onclick="closeModal('addMovieModal')">&times;</button>
+            </div>
+            <form id="addMovieForm" class="modal-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="movieTitle">Titre</label>
+                        <input type="text" id="movieTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="movieYear">Année</label>
+                        <input type="number" id="movieYear" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="movieDescription">Description</label>
+                    <textarea id="movieDescription" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="movieGenre">Genre</label>
+                        <input type="text" id="movieGenre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="movieDuration">Durée</label>
+                        <input type="text" id="movieDuration" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="moviePoster">URL de l'affiche</label>
+                        <input type="url" id="moviePoster" placeholder="https://image.tmdb.org/t/p/w500/...">
+                    </div>
+                    <div class="form-group">
+                        <label for="movieRating">Note</label>
+                        <input type="number" step="0.1" min="0" max="10" id="movieRating" placeholder="8.5">
+                    </div>
+                </div>
+                <div class="video-options">
+                    <h4>Options de vidéo (choisissez-en une)</h4>
+
+                    <div class="option-tabs">
+                        <button type="button" class="option-tab active" data-option="embed" onclick="switchVideoOption('embed')">
+                            <i class="fas fa-code"></i>
+                            Code Embed
+                        </button>
+                        <button type="button" class="option-tab" data-option="url" onclick="switchVideoOption('url')">
+                            <i class="fas fa-link"></i>
+                            URL Directe
+                        </button>
+                        <button type="button" class="option-tab" data-option="youtube" onclick="switchVideoOption('youtube')">
+                            <i class="fab fa-youtube"></i>
+                            YouTube
+                        </button>
+                    </div>
+
+                    <div id="embed-option" class="video-option active">
+                        <label for="movieEmbed">Code d'intégration (Embed) - RECOMMANDÉ</label>
+                        <textarea id="movieEmbed" placeholder="<iframe src='https://ups2up.fun/embed-xxxxx.html' frameborder='0' allowfullscreen></iframe>" rows="4"></textarea>
+                        <small style="color: var(--text-muted); font-size: 12px;">Collez ici le code embed complet fourni par UpToStream, StreamTape, etc.</small>
+                    </div>
+
+                    <div id="url-option" class="video-option">
+                        <!-- URL de la vidéo -->
+                        <div class="form-group">
+                            <label for="movieVideo">
+                                <i class="fas fa-video"></i> URL de la vidéo (remplie automatiquement après upload)
+                            </label>
+                            <input type="url" id="movieVideo" placeholder="https://example.com/film.mp4 OU sera auto-rempli après upload">
+                            <div id="videoUrlStatus" style="margin-top: 8px; padding: 8px; background: rgba(102, 126, 234, 0.1); border-radius: 6px; display: none;">
+                                <i class="fas fa-info-circle" style="color: #60a5fa;"></i>
+                                <span style="color: var(--text); font-size: 13px; font-weight: 600;">Vidéo prête : <span id="videoUrlDisplay"></span></span>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; padding: 15px 0; color: var(--text-muted); font-weight: 600; font-size: 14px;">
+                            <i class="fas fa-arrow-down"></i> CHOISISSEZ UNE OPTION CI-DESSOUS <i class="fas fa-arrow-down"></i>
+                        </div>
+
+                        <!-- Option 1: Upload de fichier -->
+                        <div class="form-group" style="border: 2px dashed rgba(102, 126, 234, 0.3); border-radius: 12px; padding: 20px; background: rgba(102, 126, 234, 0.05);">
+                            <label style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 15px;">
+                                <i class="fas fa-upload" style="color: #60a5fa;"></i>
+                                OPTION 1 : Uploader un fichier depuis votre ordinateur
+                            </label>
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <input type="file" id="movieFile" accept="video/*,.mp4,.webm,.ogg,.avi,.mkv" style="display: none;">
+                                <div class="upload-content">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Glissez-déposez votre fichier MP4 ici</p>
+                                    <span>ou</span>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('movieFile').click()">
+                                        <i class="fas fa-folder-open"></i> Parcourir mes fichiers
+                                    </button>
+                                    <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+                                        Formats acceptés: MP4, WebM, OGG, AVI, MKV (max 500MB)
+                                    </div>
+                                </div>
+                                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="progressFill"></div>
+                                    </div>
+                                    <p id="uploadStatus">Upload en cours...</p>
+                                </div>
+                                <div class="file-info" id="fileInfo" style="display: none;">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="fileInfoText"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; padding: 10px; color: var(--text-muted); font-weight: 600;">OU</div>
+
+                        <!-- Option 2: Entrer URL manuelle -->
+                        <div class="form-group" style="border: 2px dashed rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 20px; background: rgba(139, 92, 246, 0.05);">
+                            <label style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 10px;">
+                                <i class="fas fa-link" style="color: #a78bfa;"></i>
+                                OPTION 2 : Entrer une URL directe
+                            </label>
+                            <small style="color: var(--text-muted); display: block; margin-bottom: 10px;">
+                                Si votre vidéo est déjà hébergée ailleurs (ex: https://monserveur.com/videos/film.mp4)
+                            </small>
+                            <button type="button" class="btn btn-outline" onclick="document.getElementById('movieVideo').focus()">
+                                <i class="fas fa-edit"></i> Entrer l'URL manuellement
+                            </button>
+                        </div>
+
+                        <!-- Bande-annonce optionnelle -->
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="movieTrailer">
+                                <i class="fab fa-youtube"></i> Bande-annonce YouTube (optionnel)
+                            </label>
+                            <input type="url" id="movieTrailer" placeholder="https://www.youtube.com/watch?v=... (optionnel)">
+                        </div>
+                    </div>
+
+                    <div id="youtube-option" class="video-option">
+                        <label for="movieYoutube">URL YouTube</label>
+                        <input type="url" id="movieYoutube" placeholder="https://www.youtube.com/watch?v=VIDEO_ID">
+                        <small style="color: var(--text-muted); font-size: 12px;">Pour intégrer directement des vidéos YouTube</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="moviePremium">
+                        <span class="checkmark"></span>
+                        Film premium
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('addMovieModal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter le film</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

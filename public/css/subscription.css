@@ -1,0 +1,346 @@
+.subscription-hero {
+    padding: 150px 0 80px;
+    text-align: center;
+    background: 
+        radial-gradient(circle at 50% 30%, rgba(229, 9, 20, 0.15) 0%, transparent 50%);
+}
+
+.subscription-hero .hero-title {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.subscription-hero .hero-subtitle {
+    font-size: 20px;
+    color: var(--text-muted);
+    margin-bottom: 50px;
+}
+
+.billing-toggle {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50px;
+    padding: 5px;
+    gap: 5px;
+}
+
+.billing-btn {
+    padding: 15px 35px;
+    border-radius: 50px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.billing-btn.active {
+    background: var(--gradient);
+    box-shadow: 0 5px 20px rgba(229, 9, 20, 0.3);
+}
+
+.save-badge {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.subscription-plans {
+    padding: 80px 0;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.plan-card {
+    background: var(--dark-light);
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.plan-card.featured {
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.1) 0%, rgba(20, 20, 20, 1) 100%);
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.plan-card.featured:hover {
+    transform: scale(1.08) translateY(-10px);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gradient);
+    padding: 8px 25px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 5px 20px rgba(229, 9, 20, 0.4);
+}
+
+.plan-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.plan-header h2 {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+.plan-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.plan-price .price {
+    font-size: 48px;
+    font-weight: 900;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.plan-price .period {
+    font-size: 18px;
+    color: var(--text-muted);
+    margin-left: 5px;
+}
+
+.plan-description {
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+.plan-features {
+    list-style: none;
+    margin-bottom: 40px;
+}
+
+.plan-features li {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 16px;
+}
+
+.plan-features li:last-child {
+    border-bottom: none;
+}
+
+.plan-features .fa-check {
+    color: #00ff00;
+    font-size: 18px;
+}
+
+.plan-features .fa-times {
+    color: #ff0000;
+    font-size: 18px;
+    opacity: 0.3;
+}
+
+.btn-subscribe {
+    width: 100%;
+    padding: 18px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.btn-subscribe:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-subscribe.primary {
+    background: var(--gradient);
+    border-color: var(--primary);
+}
+
+.btn-subscribe.primary:hover {
+    box-shadow: 0 10px 30px rgba(229, 9, 20, 0.4);
+}
+
+.plans-comparison {
+    padding: 80px 0;
+    background: var(--dark-light);
+}
+
+.comparison-table {
+    max-width: 1000px;
+    margin: 60px auto 0;
+    overflow-x: auto;
+}
+
+.comparison-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comparison-table th {
+    font-size: 20px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+}
+
+.comparison-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.comparison-table .fa-check {
+    color: #00ff00;
+    font-size: 20px;
+}
+
+.comparison-table .fa-times {
+    color: #ff0000;
+    font-size: 20px;
+    opacity: 0.3;
+}
+
+.faq {
+    padding: 80px 0 120px;
+}
+
+.faq-list {
+    max-width: 900px;
+    margin: 60px auto 0;
+}
+
+.faq-item {
+    background: var(--dark-light);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    border-color: var(--primary);
+}
+
+.faq-question {
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.faq-question:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.faq-question h3 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.faq-question i {
+    font-size: 16px;
+    color: var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-question i {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 500px;
+}
+
+.faq-answer p {
+    padding: 0 30px 25px;
+    color: var(--text-muted);
+    line-height: 1.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .subscription-hero .hero-title {
+        font-size: 40px;
+    }
+    
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .plan-card.featured {
+        transform: scale(1);
+    }
+    
+    .comparison-table {
+        font-size: 14px;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 15px 10px;
+    }
+}

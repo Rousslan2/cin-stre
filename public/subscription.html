@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abonnements - CinéStream</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/subscription.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <span>CinéStream</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="movies.html">Films</a></li>
+                <li><a href="subscription.html" class="active">Abonnements</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline">Connexion</a>
+                <a href="register.html" class="btn btn-primary">S'inscrire</a>
+            </div>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="account.html"><i class="fas fa-user"></i> Mon compte</a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Subscription -->
+    <section class="subscription-hero">
+        <div class="container">
+            <h1 class="hero-title">
+                Choisissez le plan<br>
+                qui vous <span class="gradient-text">correspond</span>
+            </h1>
+            <p class="hero-subtitle">Profitez de 30 jours d'essai gratuit. Annulez à tout moment.</p>
+            
+            <div class="billing-toggle">
+                <button class="billing-btn active" data-billing="monthly">Mensuel</button>
+                <button class="billing-btn" data-billing="yearly">
+                    Annuel <span class="save-badge">-20%</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans d'abonnement -->
+    <section class="subscription-plans">
+        <div class="container">
+            <div class="plans-grid">
+                <!-- Plan Basique -->
+                <div class="plan-card" data-plan="basic">
+                    <div class="plan-header">
+                        <h2>Basique</h2>
+                        <div class="plan-price">
+                            <span class="price monthly">7.99€</span>
+                            <span class="price yearly" style="display: none;">6.39€</span>
+                            <span class="period">/mois</span>
+                        </div>
+                        <p class="plan-description">Pour une personne qui regarde occasionnellement</p>
+                    </div>
+                    
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Qualité vidéo HD (720p)</li>
+                        <li><i class="fas fa-check"></i> 1 écran en simultané</li>
+                        <li><i class="fas fa-check"></i> Films et séries illimités</li>
+                        <li><i class="fas fa-check"></i> Annulez quand vous voulez</li>
+                        <li><i class="fas fa-times"></i> Téléchargement</li>
+                        <li><i class="fas fa-times"></i> Support prioritaire</li>
+                    </ul>
+                    
+                    <button class="btn-subscribe" onclick="subscribe('basic')">
+                        <span>Choisir Basique</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Plan Standard (Recommandé) -->
+                <div class="plan-card featured" data-plan="standard">
+                    <div class="popular-badge">
+                        <i class="fas fa-star"></i>
+                        Le plus populaire
+                    </div>
+                    <div class="plan-header">
+                        <h2>Standard</h2>
+                        <div class="plan-price">
+                            <span class="price monthly">12.99€</span>
+                            <span class="price yearly" style="display: none;">10.39€</span>
+                            <span class="period">/mois</span>
+                        </div>
+                        <p class="plan-description">Pour les passionnés de cinéma</p>
+                    </div>
+                    
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Qualité vidéo Full HD (1080p)</li>
+                        <li><i class="fas fa-check"></i> 2 écrans en simultané</li>
+                        <li><i class="fas fa-check"></i> Films et séries illimités</li>
+                        <li><i class="fas fa-check"></i> Annulez quand vous voulez</li>
+                        <li><i class="fas fa-check"></i> Téléchargement (10 appareils)</li>
+                        <li><i class="fas fa-check"></i> Support prioritaire</li>
+                    </ul>
+                    
+                    <button class="btn-subscribe primary" onclick="subscribe('standard')">
+                        <span>Choisir Standard</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Plan Premium -->
+                <div class="plan-card" data-plan="premium">
+                    <div class="plan-header">
+                        <h2>Premium</h2>
+                        <div class="plan-price">
+                            <span class="price monthly">17.99€</span>
+                            <span class="price yearly" style="display: none;">14.39€</span>
+                            <span class="period">/mois</span>
+                        </div>
+                        <p class="plan-description">Pour toute la famille en ultra qualité</p>
+                    </div>
+                    
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> Qualité vidéo 4K Ultra HD + HDR</li>
+                        <li><i class="fas fa-check"></i> 4 écrans en simultané</li>
+                        <li><i class="fas fa-check"></i> Films et séries illimités</li>
+                        <li><i class="fas fa-check"></i> Annulez quand vous voulez</li>
+                        <li><i class="fas fa-check"></i> Téléchargement illimité</li>
+                        <li><i class="fas fa-check"></i> Support prioritaire VIP</li>
+                        <li><i class="fas fa-check"></i> Accès anticipé nouveautés</li>
+                    </ul>
+                    
+                    <button class="btn-subscribe" onclick="subscribe('premium')">
+                        <span>Choisir Premium</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparaison des plans -->
+    <section class="plans-comparison">
+        <div class="container">
+            <h2 class="section-title">Comparez nos <span class="gradient-text">plans</span></h2>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fonctionnalités</th>
+                            <th>Basique</th>
+                            <th>Standard</th>
+                            <th>Premium</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Prix mensuel</td>
+                            <td>7.99€</td>
+                            <td>12.99€</td>
+                            <td>17.99€</td>
+                        </tr>
+                        <tr>
+                            <td>Qualité vidéo</td>
+                            <td>HD</td>
+                            <td>Full HD</td>
+                            <td>4K Ultra HD</td>
+                        </tr>
+                        <tr>
+                            <td>Écrans simultanés</td>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>Téléchargements</td>
+                            <td><i class="fas fa-times"></i></td>
+                            <td>10 appareils</td>
+                            <td>Illimité</td>
+                        </tr>
+                        <tr>
+                            <td>Support prioritaire</td>
+                            <td><i class="fas fa-times"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td>VIP</td>
+                        </tr>
+                        <tr>
+                            <td>Accès anticipé</td>
+                            <td><i class="fas fa-times"></i></td>
+                            <td><i class="fas fa-times"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq">
+        <div class="container">
+            <h2 class="section-title">Questions <span class="gradient-text">Fréquentes</span></h2>
+            
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Puis-je annuler à tout moment ?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Oui, vous pouvez annuler votre abonnement à tout moment sans frais. Votre accès restera actif jusqu'à la fin de la période payée.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Comment fonctionne l'essai gratuit ?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Profitez de 30 jours d'essai gratuit sur tous nos plans. Aucune carte bancaire n'est requise pour commencer. Vous serez facturé uniquement si vous décidez de continuer après la période d'essai.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Puis-je changer de plan ?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Absolument ! Vous pouvez passer à un plan supérieur ou inférieur à tout moment. Les changements prennent effet immédiatement.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Sur quels appareils puis-je regarder ?</h3>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>CinéStream est disponible sur smartphones, tablettes, ordinateurs, Smart TV, consoles de jeux et bien plus encore.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-film"></i>
+                        <span>CinéStream</span>
+                    </div>
+                    <p>Votre destination pour le streaming de films et séries en haute qualité.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 CinéStream. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/subscription.js"></script>
+</body>
+</html>

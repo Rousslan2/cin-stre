@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecteur - CinéStream</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="player-page">
+    <!-- Header minimaliste -->
+    <header class="player-header">
+        <a href="movies.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Retour</span>
+        </a>
+        <div class="logo">
+            <i class="fas fa-film"></i>
+            <span>CinéStream</span>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn" title="Ajouter à ma liste">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="action-btn" title="Partager">
+                <i class="fas fa-share-alt"></i>
+            </button>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="account.html"><i class="fas fa-user"></i> Mon compte</a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Lecteur vidéo -->
+    <section class="video-player-section">
+        <div class="video-container">
+            <div id="videoPlayer" class="video-player">
+                <video id="mainVideo" poster="" preload="metadata">
+                    <source src="" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+                
+                <!-- Contrôles personnalisés -->
+                <div class="video-controls" id="videoControls">
+                    <div class="progress-bar">
+                        <div class="progress-filled" id="progressBar"></div>
+                        <div class="progress-handle" id="progressHandle"></div>
+                    </div>
+                    
+                    <div class="controls-bottom">
+                        <div class="controls-left">
+                            <button id="playPauseBtn" class="control-btn">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button id="volumeBtn" class="control-btn">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <div class="volume-slider">
+                                <input type="range" id="volumeSlider" min="0" max="100" value="100">
+                            </div>
+                            <div class="time-display">
+                                <span id="currentTime">0:00</span>
+                                <span>/</span>
+                                <span id="duration">0:00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="controls-right">
+                            <button id="subtitlesBtn" class="control-btn">
+                                <i class="fas fa-closed-captioning"></i>
+                            </button>
+                            <button id="settingsBtn" class="control-btn">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                            <button id="fullscreenBtn" class="control-btn">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Overlay de chargement -->
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="loading-spinner">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                </div>
+                
+                <!-- Bouton play central -->
+                <div class="center-play-btn" id="centerPlayBtn">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Informations du film -->
+    <section class="movie-info-section">
+        <div class="container">
+            <div class="movie-details">
+                <div class="movie-poster-container">
+                    <img id="moviePoster" src="" alt="" class="detail-poster">
+                </div>
+                
+                <div class="movie-content">
+                    <h1 id="movieTitle" class="detail-title"></h1>
+                    <div class="movie-meta-info">
+                        <span id="movieYear" class="meta-item"></span>
+                        <span class="meta-divider">•</span>
+                        <span id="movieDuration" class="meta-item"></span>
+                        <span class="meta-divider">•</span>
+                        <span id="movieGenre" class="meta-item"></span>
+                        <span class="meta-divider">•</span>
+                        <div class="rating-display">
+                            <i class="fas fa-star"></i>
+                            <span id="movieRating"></span>
+                        </div>
+                    </div>
+                    
+                    <p id="movieDescription" class="movie-description-text"></p>
+                    
+                    <div class="action-buttons">
+                        <button class="action-button primary" onclick="document.getElementById('mainVideo').play()">
+                            <i class="fas fa-play"></i>
+                            <span>Lire</span>
+                        </button>
+                        <button class="action-button">
+                            <i class="fas fa-plus"></i>
+                            <span>Ma liste</span>
+                        </button>
+                        <button class="action-button">
+                            <i class="fas fa-heart"></i>
+                            <span>J'aime</span>
+                        </button>
+                        <button class="action-button">
+                            <i class="fas fa-share-alt"></i>
+                            <span>Partager</span>
+                        </button>
+                    </div>
+                    
+                    <div class="movie-additional-info">
+                        <div class="info-item">
+                            <span class="info-label">Réalisateur:</span>
+                            <span class="info-value">Christopher Nolan</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Acteurs:</span>
+                            <span class="info-value">Leonardo DiCaprio, Tom Hardy, Ellen Page</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Films similaires -->
+    <section class="similar-movies">
+        <div class="container">
+            <h2 class="section-title">Films <span class="gradient-text">similaires</span></h2>
+            <div id="similarMovies" class="movies-grid">
+                <!-- Chargé dynamiquement -->
+            </div>
+        </div>
+    </section>
+
+    <script src="js/player.js"></script>
+</body>
+</html>

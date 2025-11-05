@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Compte - CinéStream</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/account.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <span>CinéStream</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="movies.html">Films</a></li>
+                <li><a href="subscription.html">Abonnements</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline">Connexion</a>
+                <a href="register.html" class="btn btn-primary">S'inscrire</a>
+            </div>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="account.html" class="active"><i class="fas fa-user"></i> Mon compte</a>
+                    <a href="admin.html" id="adminMenuBtn" class="admin-only" style="display: none;">
+                        <i class="fas fa-cog"></i> Administration
+                    </a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Account Section -->
+    <section class="account-section">
+        <div class="container">
+            <div class="account-container">
+                <!-- Sidebar -->
+                <div class="account-sidebar">
+                    <div class="user-profile">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 id="sidebarUserName"></h3>
+                        <p id="sidebarUserEmail"></p>
+                    </div>
+
+                    <nav class="account-nav">
+                        <a href="#profile" class="nav-link active" data-section="profile">
+                            <i class="fas fa-user-edit"></i>
+                            Profil
+                        </a>
+                        <a href="#subscription" class="nav-link" data-section="subscription">
+                            <i class="fas fa-crown"></i>
+                            Abonnement
+                        </a>
+                        <a href="#security" class="nav-link" data-section="security">
+                            <i class="fas fa-shield-alt"></i>
+                            Sécurité
+                        </a>
+                        <a href="#preferences" class="nav-link" data-section="preferences">
+                            <i class="fas fa-cog"></i>
+                            Préférences
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Main Content -->
+                <div class="account-content">
+                    <!-- Profile Section -->
+                    <div id="profile-section" class="content-section active">
+                        <div class="section-header">
+                            <h2><i class="fas fa-user-edit"></i> Informations personnelles</h2>
+                            <p>Gérez vos informations personnelles et de contact</p>
+                        </div>
+
+                        <form id="profileForm" class="account-form">
+                            <div class="form-group">
+                                <label for="name">Nom complet</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Adresse email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Enregistrer les modifications
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Subscription Section -->
+                    <div id="subscription-section" class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-crown"></i> Mon abonnement</h2>
+                            <p>Gérez votre abonnement et consultez votre historique</p>
+                        </div>
+
+                        <div class="subscription-status" id="subscriptionStatus">
+                            <!-- Chargé dynamiquement -->
+                        </div>
+
+                        <div class="subscription-actions">
+                            <a href="subscription.html" class="btn btn-primary">
+                                <i class="fas fa-arrow-up"></i>
+                                Changer de plan
+                            </a>
+                            <button class="btn btn-outline" onclick="cancelSubscription()">
+                                <i class="fas fa-times"></i>
+                                Annuler l'abonnement
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Security Section -->
+                    <div id="security-section" class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-shield-alt"></i> Sécurité</h2>
+                            <p>Modifiez votre mot de passe et gérez la sécurité de votre compte</p>
+                        </div>
+
+                        <form id="passwordForm" class="account-form">
+                            <div class="form-group">
+                                <label for="currentPassword">Mot de passe actuel</label>
+                                <input type="password" id="currentPassword" name="currentPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newPassword">Nouveau mot de passe</label>
+                                <input type="password" id="newPassword" name="newPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key"></i>
+                                    Changer le mot de passe
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Preferences Section -->
+                    <div id="preferences-section" class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-cog"></i> Préférences</h2>
+                            <p>Personnalisez votre expérience sur CinéStream</p>
+                        </div>
+
+                        <form id="preferencesForm" class="account-form">
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="emailNotifications" name="emailNotifications">
+                                    <span class="checkmark"></span>
+                                    Recevoir les notifications par email
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="marketingEmails" name="marketingEmails">
+                                    <span class="checkmark"></span>
+                                    Recevoir les offres promotionnelles
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="language">Langue préférée</label>
+                                <select id="language" name="language">
+                                    <option value="fr">Français</option>
+                                    <option value="en">English</option>
+                                </select>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Enregistrer les préférences
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-film"></i>
+                        <span>CinéStream</span>
+                    </div>
+                    <p>Votre destination pour le streaming de films et séries en haute qualité.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 CinéStream. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/account.js"></script>
+</body>
+</html>

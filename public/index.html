@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinéStream - Streaming de Films Premium</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <span>CinéStream</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="movies.html">Films</a></li>
+                <li><a href="subscription.html">Abonnements</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="login.html" class="btn btn-outline">Connexion</a>
+                <a href="register.html" class="btn btn-primary">S'inscrire</a>
+            </div>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-info">
+                    <span id="userName"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="account.html"><i class="fas fa-user"></i> Mon compte</a>
+                    <a href="admin.html" id="adminMenuBtn" class="admin-only" style="display: none;">
+                        <i class="fas fa-cog"></i> Administration
+                    </a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section avec effet 3D -->
+    <section class="hero">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="gradient-text">Découvrez</span><br>
+                    Une Expérience<br>
+                    Cinématographique<br>
+                    <span class="gradient-text">Unique</span>
+                </h1>
+                <p class="hero-subtitle">Des milliers de films et séries en streaming illimité. Qualité 4K, sans publicité.</p>
+                <div class="hero-buttons">
+                    <a href="register.html" class="btn btn-hero guest-only" id="heroRegisterBtn">
+                        <span>Commencer Gratuitement</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="movies.html" class="btn btn-hero user-only" id="heroMoviesBtn" style="display: none;">
+                        <span>Accéder aux Films</span>
+                        <i class="fas fa-play"></i>
+                    </a>
+                    <a href="movies.html" class="btn btn-hero-outline">
+                        <i class="fas fa-play"></i>
+                        <span>Découvrir</span>
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Films</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">4K</div>
+                        <div class="stat-label">Ultra HD</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Publicité</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="floating-card card-1">
+                    <img src="https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg" alt="Film">
+                    <div class="card-overlay">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class="floating-card card-2">
+                    <img src="https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg" alt="Film">
+                    <div class="card-overlay">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class="floating-card card-3">
+                    <img src="https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" alt="Film">
+                    <div class="card-overlay">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Section Fonctionnalités -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Pourquoi choisir <span class="gradient-text">CinéStream</span> ?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-infinity"></i>
+                    </div>
+                    <h3>Streaming Illimité</h3>
+                    <p>Accédez à des milliers de films et séries sans limite</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tv"></i>
+                    </div>
+                    <h3>Qualité 4K Ultra HD</h3>
+                    <p>Profitez d'une qualité d'image exceptionnelle</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Téléchargement Hors Ligne</h3>
+                    <p>Regardez vos films préférés sans connexion</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Profils Multiples</h3>
+                    <p>Créez jusqu'à 5 profils par compte</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <h3>Sans Publicité</h3>
+                    <p>Une expérience de visionnage ininterrompue</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Multi-Plateforme</h3>
+                    <p>Disponible sur tous vos appareils</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Films Populaires -->
+    <section class="popular-movies">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Films <span class="gradient-text">Populaires</span></h2>
+                <a href="movies.html" class="btn btn-outline">Voir tout</a>
+            </div>
+            <div class="movies-slider" id="popularMovies">
+                <!-- Les films seront chargés dynamiquement -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Plans -->
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title">Choisissez votre <span class="gradient-text">Plan</span></h2>
+            <p class="section-subtitle">Profitez de 30 jours d'essai gratuit sur tous les plans</p>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Basique</h3>
+                        <div class="price">
+                            <span class="currency">€</span>
+                            <span class="amount">7.99</span>
+                            <span class="period">/mois</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Qualité HD</li>
+                        <li><i class="fas fa-check"></i> 1 écran simultané</li>
+                        <li><i class="fas fa-check"></i> Films et séries illimités</li>
+                        <li><i class="fas fa-times"></i> Téléchargement</li>
+                    </ul>
+                    <a href="register.html" class="btn btn-outline-full">Commencer</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="badge">Populaire</div>
+                    <div class="pricing-header">
+                        <h3>Standard</h3>
+                        <div class="price">
+                            <span class="currency">€</span>
+                            <span class="amount">12.99</span>
+                            <span class="period">/mois</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Qualité Full HD</li>
+                        <li><i class="fas fa-check"></i> 2 écrans simultanés</li>
+                        <li><i class="fas fa-check"></i> Films et séries illimités</li>
+                        <li><i class="fas fa-check"></i> Téléchargement</li>
+                    </ul>
+                    <a href="register.html" class="btn btn-primary-full">Commencer</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Premium</h3>
+                        <div class="price">
+                            <span class="currency">€</span>
+                            <span class="amount">17.99</span>
+                            <span class="period">/mois</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Qualité 4K Ultra HD</li>
+                        <li><i class="fas fa-check"></i> 4 écrans simultanés</li>
+                        <li><i class="fas fa-check"></i> Films et séries illimités</li>
+                        <li><i class="fas fa-check"></i> Téléchargement illimité</li>
+                    </ul>
+                    <a href="register.html" class="btn btn-outline-full">Commencer</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-film"></i>
+                        <span>CinéStream</span>
+                    </div>
+                    <p>Votre destination pour le streaming de films et séries en haute qualité.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="movies.html">Films</a></li>
+                        <li><a href="subscription.html">Abonnements</a></li>
+                        <li><a href="#">À propos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Centre d'aide</a></li>
+                        <li><a href="#">Nous contacter</a></li>
+                        <li><a href="#">Conditions d'utilisation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Restez informé des nouveautés</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Votre email">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 CinéStream. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
