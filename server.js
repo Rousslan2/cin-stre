@@ -10,11 +10,12 @@ require('dotenv').config();
 const app = express();
 const PORT = 3000;
 
-// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+// Suppression de la route favicon spécifique - Express static gérera automatiquement
 
 // Servir les fichiers uploadés
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
