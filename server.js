@@ -8,7 +8,7 @@ const path = require('path');
 require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -37,19 +37,61 @@ app.use(session({
 }));
 
 // Base de données PostgreSQL
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+const getDatabaseUrl = () => {
+    // Railway will provide DATABASE_URL automatically
+    if (process.env.DATABASE_URL) {
+        return process.env.DATABASE_URL;
+    }
+    
+    // Fallback for local development
+    if (process.env.NODE_ENV !== 'production') {
+        console.log('⚠️  DATABASE_URL not found, using local PostgreSQL fallback');
+        return process.env.LOCAL_DATABASE_URL || 'postgresql://postgres:password@localhost:5432/streaming_db';
+    }
+    
+    throw new Error('DATABASE_URL environment variable is required in production');
+};
 
-pool.on('connect', () => {
-    console.log('Connecté à la base de données PostgreSQL');
-    initDatabase().catch(console.error);
-});
+// Déclarer pool au niveau global pour l'utiliser dans tout le fichier
+let pool;
 
-pool.on('error', (err) => {
-    console.error('Erreur de connexion à la base de données:', err);
-});
+try {
+    pool = new Pool({
+        connectionString: getDatabaseUrl(),
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    });
+
+    pool.on('connect', () => {
+        console.log('✓ Connecté à la base de données PostgreSQL');
+        initDatabase().catch(console.error);
+    });
+
+    pool.on('error', (err) => {
+        console.error('❌ Erreur de connexion à la base de données:', err.message);
+    });
+
+    // Test the connection immediately
+    pool.query('SELECT NOW()', (err, res) => {
+        if (err) {
+            console.error('❌ Échec du test de connexion à la base de données:', err.message);
+            if (process.env.NODE_ENV === 'production') {
+                console.error('💡 Vérifiez que DATABASE_URL est configuré dans Railway');
+                console.error('💡 Go to Railway Dashboard > Variables tab and add DATABASE_URL');
+                process.exit(1);
+            }
+        } else {
+            console.log('✓ Test de connexion réussi à', res.rows[0].now);
+        }
+    });
+
+} catch (dbError) {
+    console.error('❌ Erreur de configuration de la base de données:', dbError.message);
+    if (process.env.NODE_ENV === 'production') {
+        console.error('💡 Assurez-vous que DATABASE_URL est configuré dans les variables d\'environnement Railway');
+        console.error('💡 Go to Railway Dashboard > Variables tab and add DATABASE_URL');
+        process.exit(1);
+    }
+}
 
 // Initialisation de la base de données
 async function initDatabase() {
@@ -725,6 +767,30 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Route de santé pour vérifier que le serveur fonctionne
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        database: pool ? 'Connected' : 'Disconnected'
+    });
+});
+
+// Gestion d'erreur globale
+process.on('uncaughtException', (err) => {
+    console.error('❌ Erreur non capturée:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Promesse rejetée non gérée:', reason);
+    process.exit(1);
+});
+
+// Démarrage du serveur
 app.listen(PORT, () => {
-    console.log(`🎬 Serveur de streaming démarré sur http://localhost:${PORT}`);
+    console.log(`🎬 Serveur de streaming démarré sur le port ${PORT}`);
+    console.log(`🌐 URL: http://localhost:${PORT}`);
+    console.log(`📱 Admin: admin@cinestream.com / admin123`);
+    console.log(`💾 Base de données: ${process.env.DATABASE_URL ? 'PostgreSQL (Railway)' : 'PostgreSQL (Local)'}`);
 });
