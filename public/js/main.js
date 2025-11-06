@@ -11,7 +11,9 @@ window.addEventListener('scroll', () => {
 // Charger les films populaires
 async function loadPopularMovies() {
     try {
-        const response = await fetch('/api/movies');
+        const response = await fetch('/api/movies', {
+            credentials: 'include' // ESSENTIEL pour les cookies de session
+        });
         const movies = await response.json();
         
         const container = document.getElementById('popularMovies');
@@ -45,7 +47,9 @@ function goToMovie(movieId) {
 // Vérifier l'authentification
 async function checkAuth() {
     try {
-        const response = await fetch('/api/check-auth');
+        const response = await fetch('/api/check-auth', {
+            credentials: 'include' // ESSENTIEL pour les cookies de session
+        });
         const data = await response.json();
 
         if (data.authenticated) {
@@ -110,7 +114,10 @@ function updateNavForAuthenticatedUser(user) {
 // Déconnexion
 async function logout() {
     try {
-        await fetch('/api/logout', { method: 'POST' });
+        await fetch('/api/logout', {
+            method: 'POST',
+            credentials: 'include' // ESSENTIEL pour les cookies de session
+        });
         window.location.href = 'index.html';
     } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);

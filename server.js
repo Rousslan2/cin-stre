@@ -10,7 +10,39 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Trust proxy pour Railway (important pour les cookies sécurisés)
+app.set('trust proxy', 1);
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Permettre les requêtes sans origin (mobile apps, etc.)
+        if (!origin) return callback(null, true);
+        
+        // En production, vous pouvez être plus strict
+        if (process.env.NODE_ENV === 'production') {
+            // Allow Railway domains and your custom domain
+            const allowedOrigins = [
+                /\.railway\.app$/,
+                /\.up\.railway\.app$/,
+                // Ajoutez votre domaine personnalisé ici
+            ];
+            
+            const isAllowed = allowedOrigins.some(pattern => {
+                if (pattern instanceof RegExp) {
+                    return pattern.test(origin);
+                }
+                return origin === pattern;
+            });
+            
+            return callback(null, isAllowed);
+        }
+        
+        // En développement, tout est autorisé
+        callback(null, true);
+    },
+    credentials: true // ESSENTIEL pour les cookies de session
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -32,7 +64,8 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 24 heures
-        secure: process.env.NODE_ENV === 'production' // HTTPS en production
+        secure: process.env.NODE_ENV === 'production', // HTTPS en production
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Corrige les problèmes cross-origin
     }
 }));
 
@@ -295,7 +328,14 @@ app.get('/api/check-auth', checkDatabase, async (req, res) => {
 });
 
 // Récupérer tous les films
-app.get('/api/movies', checkDatabase, async (req, res) => {
+app.get('/api/movies', async (req, res) => {
+    if (!databaseAvailable || !pool) {
+        return res.status(503).json({
+            error: 'Service temporairement indisponible - Base de données non configurée',
+            databaseStatus: 'disconnected'
+        });
+    }
+    
     try {
         const result = await pool.query('SELECT * FROM movies ORDER BY id');
         res.json(result.rows);
@@ -799,7 +839,17 @@ app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
         timestamp: new Date().toISOString(),
-        database: pool ? 'Connected' : 'Disconnected'
+        database: pool ? 'Connected' : 'Disconnected',
+        session: {
+            configured: !!process.env.SESSION_SECRET,
+            secretPresent: !!process.env.SESSION_SECRET,
+            environment: process.env.NODE_ENV || 'development',
+            proxyTrust: true
+        },
+        cors: {
+            configured: true,
+            credentials: true
+        }
     });
 });
 

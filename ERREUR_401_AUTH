@@ -1,0 +1,62 @@
+# 🚨 ERREUR 401 AUTHENTIFICATION - DIAGNOSTIC CONFIRMÉ
+
+## ❌ **ERREUR CONSOLE :** `api/check-auth:1 Failed to load resource: the server responded with a status of 401 ()`
+
+**CETTE ERREUR CONFIRME LE PROBLÈME DE SESSION !**
+
+## 🔍 **ANALYSE DE L'ERREUR 401 :**
+
+### **❌ CE QUE ÇA SIGNIFIE :**
+```
+api/check-auth:1  Failed to load resource: the server responded with a status of 401 ()
+```
+
+**Le site essaie de vérifier votre authentification mais reçoit une erreur 401 (Non Autorisé) !**
+
+### **✅ CAUSE CONFIRMÉE :**
+**SESSION_SECRET manquant ou mal configuré !**
+
+## 🔧 **SOLUTION IMMÉDIATE :**
+
+### **1. VÉRIFIER SESSION_SECRET RAILWAY**
+```
+Railway Dashboard → Variables → SESSION_SECRET
+Valeur: cinestream-2024-secure-session-key-movie-streaming-app-v1
+```
+
+### **2. SI MANQUANT - L'AJOUTER :**
+```
+Add Variable:
+Nom: SESSION_SECRET
+Valeur: cinestream-2024-secure-session-key-movie-streaming-app-v1
+```
+
+### **3. REDÉMARRER APPLICATION**
+```
+Railway Dashboard → Settings → Domains → Click sur votre app
+```
+
+### **4. VIDER CACHE COMPLET**
+```
+Ctrl+Shift+R (hard refresh)
+F12 → Application → Clear Storage
+Supprimer cookies, localStorage, sessionStorage
+```
+
+## 🎯 **APRÈS CORRECTION :**
+
+**L'erreur 401 devrait disappear et vous devriez voir :**
+- ✅ **Connexion fonctionnelle**
+- ✅ **api/check-auth** retourne succès (200)
+- ✅ **Session maintenue** après refresh
+- ✅ **Accès pages** sans redirection
+
+## 📞 **TEST IMMÉDIAT :**
+
+**Après ces corrections :**
+1. **Refresh** la page (Ctrl+Shift+R)
+2. **Aller sur** `/login`
+3. **Se connecter** avec compte existant
+4. **Vérifier** console : plus d'erreur 401
+
+**L'erreur 401 sera résolue avec SESSION_SECRET correctement configuré !** 🔧

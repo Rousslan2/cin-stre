@@ -48,6 +48,7 @@ if (registerForm) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include', // ESSENTIEL pour les cookies de session
                 body: JSON.stringify(formData)
             });
             
@@ -85,6 +86,7 @@ if (loginForm) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                credentials: 'include', // ESSENTIEL pour les cookies de session
                 body: JSON.stringify(formData)
             });
             
