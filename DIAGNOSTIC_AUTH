@@ -1,0 +1,112 @@
+# 🎯 DIAGNOSTIC COMPLET - PROBLÈME AUTHENTIFICATION
+
+## ❌ **PROBLÈME :** "Une fois connecté, ça me met pas connecté"
+
+## 🔍 **ÉTAPE 1 : DIAGNOSTIC RAILWAY**
+
+### **Vérifier Variables Railway :**
+```
+Railway Dashboard → Variables
+```
+
+**Vous DEVEZ avoir :**
+```
+✅ DATABASE_URL=postgresql://...
+✅ SESSION_SECRET=cinestream-2024-secure-session-key-movie-streaming-app-v1
+✅ NODE_ENV=production
+✅ PGHOST, PGPORT, PGUSER, PGPASSWORD
+```
+
+### **SI VARIABLES MANQUANTES :**
+1. **Créer PostgreSQL :** Database → New Database → PostgreSQL
+2. **Ajouter variables manuelles :**
+   ```
+   SESSION_SECRET=cinestream-2024-secure-session-key-movie-streaming-app-v1
+   NODE_ENV=production
+   ```
+
+## 🔍 **ÉTAPE 2 : DIAGNOSTIC BASE DE DONNÉES**
+
+### **Vérifier Tables PostgreSQL :**
+```
+Railway Dashboard → Database → PostgreSQL → Connect
+```
+
+**Exécuter requête SQL :**
+```sql
+SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+```
+
+**Vous DEVEZ voir :**
+- ✅ `users` (table utilisateurs)
+- ✅ `films` (table films)
+- ✅ `sessions` (table sessions)
+
+### **SI TABLES MANQUANTES :**
+```bash
+git add .
+git commit -m "Initialize database - Create users and films tables"
+git push origin main
+```
+
+## 🔍 **ÉTAPE 3 : DIAGNOSTIC LOGS APPLICATION**
+
+### **Vérifier Logs Déploiement :**
+```
+Railway Dashboard → Deployments → Latest Deployment → Logs
+```
+
+**Chercher ces lignes :**
+```
+✅ PostgreSQL database connected successfully
+✅ Database tables initialized
+✅ Server running on port 3000
+```
+
+**SI manquant :** Base de données non initialisée !
+
+## ✅ **SOLUTION COMPLETE**
+
+### **1. Si base non initialisée :**
+```bash
+git add . && git commit -m "Initialize PostgreSQL database - Complete setup" && git push origin main
+```
+
+### **2. Vérifier logs après déploiement :**
+- Attendre 30 secondes
+- Vérifier que les tables sont créées
+- Noter URL de l'application
+
+### **3. Créer compte utilisateur :**
+1. **Aller sur** `[VOTRE_URL_RAILWAY]/register`
+2. **Créer compte** avec email/mot de passe
+3. **Se connecter** avec ce compte
+
+### **4. Test d'authentification :**
+1. **Se connecter** sur le site
+2. **Naviguer** vers `/admin` ou `/account`
+3. **Vérifier** que la session persiste
+
+## 🎯 **SOLUTIONS PAR PROBLÈME**
+
+### **PROBLÈME : Tables non créées**
+**SOLUTION :** Redéployer avec initialisation PostgreSQL
+
+### **PROBLÈME : SESSION_SECRET manquant**  
+**SOLUTION :** Ajouter la variable dans Railway
+
+### **PROBLÈME : Pas de compte admin**
+**SOLUTION :** Créer compte via `/register`
+
+### **PROBLÈME : Cookies supprimés**
+**SOLUTION :** Refuser tous cookies → Reconnecter
+
+## 📞 **TEST FINAL**
+
+**Après solution :**
+1. ✅ **Connexion fonctionne** (pas de déconnexion)
+2. ✅ **Session persistante** (navigation sans déconnexion)
+3. ✅ **Accès admin** (page `/admin` accessible)
+4. ✅ **Upload films** (fonctionnel)
+
+**Votre application streaming sera 100% opérationnelle !** 🎬

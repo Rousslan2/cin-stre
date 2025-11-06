@@ -1,0 +1,98 @@
+# 🚨 PROBLÈME AUTHENTIFICATION - APPLICATION STREAMING
+
+## ❌ **PROBLÈME :** "Une fois connecté, ça me met pas connecté"
+
+**CE PROBLÈME EST DANS L'APPLICATION, PAS DANS RAILWAY !**
+
+## 🔍 **DIAGNOSTIC PROBLÈME AUTHENTIFICATION**
+
+### **1. VÉRIFICATION SESSION_SECRET**
+**Le SESSION_SECRET est peut-être manquant ou invalide :**
+
+```
+Railway Dashboard → Variables → Vérifier :
+SESSION_SECRET=cinestream-2024-secure-session-key-movie-streaming-app-v1
+```
+
+### **2. VÉRIFIER BASE DE DONNÉES UTILISATEURS**
+
+#### **Railway Dashboard → Database → PostgreSQL :**
+- Cliquer sur votre PostgreSQL
+- Onglet "Connect" ou "Console"
+- **Vérifier tables existantes :**
+
+```sql
+SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+```
+
+**Vous devriez voir :**
+- ✅ **users** (table utilisateurs)
+- ✅ **films** (table films)
+
+#### **Si table USERS n'existe pas :**
+Le problème est que la base n'a pas été initialisée !
+
+### **3. SOLUTION - INITIALISER BASE DE DONNÉES**
+
+#### **A. Vérifier Logs Application :**
+```
+Railway Dashboard → Deployments → Latest Deployment → Logs
+```
+
+**Chercher :**
+- ❌ `Database tables initialized` (si absent)
+- ❌ `Error initializing database` (si présent)
+
+#### **B. Redéployer pour Initialiser DB :**
+```bash
+git add . && git commit -m "Initialize database tables - PostgreSQL" && git push origin main
+```
+
+### **4. CRÉER COMPTE ADMIN SI BESOIN**
+
+#### **Après déploiement réussi :**
+```bash
+# Test création compte (optionnel)
+node add-test-film.js
+```
+
+**OU utiliser l'interface web :**
+- Aller sur `/register`
+- Créer compte admin
+- Connecter
+
+### **5. VÉRIFICATION COOKIES/SESSIONS**
+
+#### **Dans votre navigateur :**
+1. **F12 → Application → Cookies**
+2. **Vérifier :**
+   - ✅ Cookie `connect.sid` présent
+   - ✅ Session sauvegardée
+
+#### **Si cookie absent :**
+Le problème SESSION_SECRET !
+
+## 🎯 **SOLUTION RAPIDE**
+
+### **SI VARIABLES MANQUANTES :**
+```
+SESSION_SECRET=cinestream-2024-secure-session-key-movie-streaming-app-v1
+NODE_ENV=production
+```
+
+### **SI BASE NON INITIALISÉE :**
+```bash
+git add . && git commit -m "Initialize database - PostgreSQL ready" && git push origin main
+```
+
+### **SI COOKIES PROBLÈMATIQUES :**
+1. **Supprimer cookies navigateur**
+2. **Actualiser page**
+3. **Se reconnecter**
+
+## 📞 **CONTACT SUPPORT**
+
+**Si problème persistant après ces étapes :**
+1. **Logs complets Railway**
+2. **Contenu table users** (SQL)
+3. **Erreurs console navigateur** (F12)

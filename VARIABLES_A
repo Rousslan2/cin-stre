@@ -1,0 +1,33 @@
+# 🚨 VARIABLES À AJOUTER SUR RAILWAY
+
+## 📋 **VOICI CE QUE VOUS DEVEZ AJOUTER :**
+
+### **Railway Dashboard → Variables → Add Variable**
+
+#### **VARIABLE 1 :**
+```
+Nom: SESSION_SECRET
+Valeur: cinestream-2024-secure-session-key-movie-streaming-app-v1
+```
+
+#### **VARIABLE 2 :**
+```
+Nom: NODE_ENV  
+Valeur: production
+```
+
+## ✅ **C'EST TOUT !**
+
+**Après avoir ajouté ces 2 variables :**
+1. Votre application fonctionnera parfaitement
+2. Les sessions seront sécurisées
+3. L'authentification marchera
+
+## 🎯 **PAS D'AUTRES VARIABLES NÉCESSAIRES !**
+
+**Toutes les autres variables sont générées automatiquement par Railway :**
+- ✅ DATABASE_URL (auto)
+- ✅ PGHOST (auto)
+- ✅ PGPORT (auto) 
+- ✅ PGUSER (auto)
+- ✅ PGPASSWORD (auto)
