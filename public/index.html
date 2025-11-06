@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CinéStream - Streaming de Films Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#e50914">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -38,8 +42,48 @@
                     <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                 </div>
             </div>
+            <!-- Menu Hamburger Mobile -->
+            <div class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
     </nav>
+
+    <!-- Overlay Menu Mobile -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+    <!-- Menu Mobile -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-user-menu" id="mobileUserMenu" style="display: none;">
+            <div class="mobile-user-info" onclick="toggleMobileDropdown()">
+                <i class="fas fa-user"></i>
+                <div class="mobile-user-details">
+                    <div class="user-name" id="mobileUserName">Utilisateur</div>
+                    <div class="user-role">Membre</div>
+                </div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-dropdown-menu" id="mobileDropdownMenu">
+                <a href="account.html"><i class="fas fa-user"></i> Mon compte</a>
+                <a href="admin.html" id="mobileAdminMenuBtn" class="admin-only" style="display: none;">
+                    <i class="fas fa-cog"></i> Administration
+                </a>
+                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+            </div>
+        </div>
+        <ul class="mobile-nav-menu">
+            <li><a href="index.html" class="active">Accueil</a></li>
+            <li><a href="movies.html">Films</a></li>
+            <li><a href="subscription.html">Abonnements</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="mobile-nav-buttons" id="mobileNavButtons">
+            <a href="login.html" class="btn btn-outline">Connexion</a>
+            <a href="register.html" class="btn btn-primary">S'inscrire</a>
+        </div>
+    </div>
 
     <!-- Hero Section avec effet 3D -->
     <section class="hero">
@@ -287,5 +331,6 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <script src="js/mobile-config.js"></script>
 </body>
 </html>
